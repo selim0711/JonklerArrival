@@ -5,19 +5,23 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 10f;
+    [SerializeField] private float crouchSpeed = 2.5f;
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private float lookSensitivity = 2f; // Adjust this value to control sensitivity
+    [SerializeField] private float lookSensitivity = 2f;
+    [SerializeField] private float crouchHeight = 1f; // Height when crouched
+    [SerializeField] private float standingHeight = 2f; // Height when standing
     [SerializeField] private Transform cameraTransform;
 
     private PlayerInput playerInput;
     private InputAction moveAction;
-    private InputAction lookAction;
     private InputAction jumpAction;
     private InputAction sprintAction;
+    private InputAction crouchAction;
 
     private Rigidbody rb;
     private bool isGrounded;
     private bool isSprinting;
+    private bool isCrouching;
 
     private void Awake()
     {
@@ -27,9 +31,9 @@ public class Player : MonoBehaviour
         if (playerInput != null)
         {
             moveAction = playerInput.actions["Move"];
-            lookAction = playerInput.actions["Look"];
             jumpAction = playerInput.actions["Jump"];
             sprintAction = playerInput.actions["Sprint"];
+            crouchAction = playerInput.actions["Crouch"];
         }
         else
         {
@@ -47,6 +51,12 @@ public class Player : MonoBehaviour
             sprintAction.performed += ctx => isSprinting = true;
             sprintAction.canceled += ctx => isSprinting = false;
         }
+
+        if (crouchAction != null)
+        {
+            crouchAction.performed += StartCrouch;
+            crouchAction.canceled += StopCrouch;
+        }
     }
 
     private void OnDisable()
@@ -59,18 +69,24 @@ public class Player : MonoBehaviour
             sprintAction.performed -= ctx => isSprinting = true;
             sprintAction.canceled -= ctx => isSprinting = false;
         }
+
+        if (crouchAction != null)
+        {
+            crouchAction.performed -= StartCrouch;
+            crouchAction.canceled -= StopCrouch;
+        }
     }
 
     private void Update()
     {
-        if (moveAction != null) HandleMovement();
-        if (lookAction != null) HandleLook();
+        HandleMovement();
+        HandleLook();
     }
 
     private void HandleMovement()
     {
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
-        float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
+        float currentSpeed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
 
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
         direction = cameraTransform.forward * direction.z + cameraTransform.right * direction.x;
@@ -82,20 +98,39 @@ public class Player : MonoBehaviour
 
     private void HandleLook()
     {
-        Vector2 lookInput = lookAction.ReadValue<Vector2>();
+        Vector2 lookInput = Mouse.current.delta.ReadValue();
         Vector2 lookDelta = lookInput * lookSensitivity * Time.deltaTime;
 
-        transform.Rotate(0f, lookDelta.x, 0f); // Horizontal rotation for player
-        cameraTransform.Rotate(-lookDelta.y, 0f, 0f); // Vertical rotation for camera
+        transform.Rotate(0f, lookDelta.x, 0f);
+        cameraTransform.Rotate(-lookDelta.y, 0f, 0f);
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        if (isGrounded)
+        if (isGrounded && !isCrouching) // Prevent jumping while crouched
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
+    }
+
+    private void StartCrouch(InputAction.CallbackContext context)
+    {
+        isCrouching = true;
+        AdjustHeight(crouchHeight);
+    }
+
+    private void StopCrouch(InputAction.CallbackContext context)
+    {
+        isCrouching = false;
+        AdjustHeight(standingHeight);
+    }
+
+    private void AdjustHeight(float height)
+    {
+        Vector3 scale = transform.localScale;
+        scale.y = height / standingHeight; // Adjust the scale proportionally
+        transform.localScale = scale;
     }
 
     private void OnCollisionEnter(Collision collision)
