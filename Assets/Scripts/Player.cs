@@ -105,7 +105,7 @@ public class Player : MonoBehaviour
         cameraTransform.Rotate(-lookDelta.y, 0f, 0f);
     }
 
-    private void OnJump(InputAction.CallbackContext context)
+    public void OnJump(InputAction.CallbackContext context)
     {
         if (isGrounded && !isCrouching) // Prevent jumping while crouched
         {
