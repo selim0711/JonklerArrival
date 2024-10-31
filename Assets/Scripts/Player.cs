@@ -8,8 +8,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float crouchSpeed = 2.5f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float lookSensitivity = 2f;
-    [SerializeField] private float crouchHeight = 1f; // Height when crouched
-    [SerializeField] private float standingHeight = 2f; // Height when standing
+    [SerializeField] private float crouchHeight = 1f;
+    [SerializeField] private float standingHeight = 2f;
     [SerializeField] private Transform cameraTransform;
 
     private PlayerInput playerInput;
