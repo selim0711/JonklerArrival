@@ -13,9 +13,10 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     [Header("Noise Settings")]
-    [SerializeField] private float walkNoiseIntensity = 1f;
-    [SerializeField] private float sprintNoiseIntensity = 3f;
-    [SerializeField] private float crouchNoiseIntensity = 0.5f;
+    [SerializeField] private float walkNoiseIntensity = 5f;
+    [SerializeField] private float sprintNoiseIntensity = 9f;
+    [SerializeField] private float crouchNoiseIntensity = 1f;
+    [SerializeField] private float jumpNoiseIntensity = 15f;
 
     private PlayerInput playerInput;
     private InputAction moveAction;
@@ -28,11 +29,14 @@ public class Player : MonoBehaviour
     private bool isSprinting;
     private bool isCrouching;
 
+    [SerializeField] private LayerMask enemyLayer;
+
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody>();
 
+    
         if (playerInput == null)
         {
             Debug.LogError("PlayerInput component is missing.");
@@ -80,7 +84,7 @@ public class Player : MonoBehaviour
         direction.y = 0f;
 
         Vector3 moveVelocity = direction * currentSpeed * Time.deltaTime;
-        transform.Translate(moveVelocity, Space.World);
+        rb.MovePosition(rb.position + moveVelocity);
     }
 
     private void HandleLook()
@@ -98,7 +102,7 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
-            MakeNoise(sprintNoiseIntensity); // Jumping creates a louder noise
+            MakeNoise(jumpNoiseIntensity); // Jumping creates a louder noise
         }
     }
 
@@ -155,6 +159,18 @@ public class Player : MonoBehaviour
             }
         }
     }
+    /*
+    private void MakeNoise(float intensity)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, intensity);
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.TryGetComponent(out EnemyAI enemyAI))
+            {
+                enemyAI.DetectNoise(transform.position, intensity);
+            }
+        }
+    }*/
 
     private void OnCollisionEnter(Collision collision)
     {

@@ -8,15 +8,15 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float viewAngle = 45f;
 
     [Header("Hearing Settings")]
-    [SerializeField] private float hearingRadius = 15f;
+    [SerializeField] private float hearingRadius = 15f; // Increase if necessary
 
     [Header("Detection Settings")]
-    [SerializeField] private Transform player;
-    [SerializeField] private LayerMask playerLayer;        // Assign this to "Player" layer in Inspector
-    [SerializeField] private LayerMask obstructionLayer;    // Set this to "Environment" layer in Inspector
+    [SerializeField] public Transform player;
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private LayerMask obstructionLayer;
 
     private NavMeshAgent navMeshAgent;
-    private bool playerInSight;
+    public bool playerInSight;
     private Vector3 lastKnownNoisePosition;
 
     private void Awake()
@@ -50,14 +50,13 @@ public class EnemyAI : MonoBehaviour
 
             if (angleToPlayer < viewAngle / 2)
             {
-                // Use RaycastAll to ensure only player layer is hit, considering obstructions
                 RaycastHit[] hits = Physics.RaycastAll(transform.position, directionToPlayer, viewDistance);
                 foreach (RaycastHit hit in hits)
                 {
                     if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
                     {
                         playerInSight = true;
-                        lastKnownNoisePosition = Vector3.zero; // Reset noise tracking if player is seen
+                        lastKnownNoisePosition = Vector3.zero;
                         break;
                     }
                     else if ((1 << hit.collider.gameObject.layer & obstructionLayer) != 0)
@@ -69,12 +68,32 @@ public class EnemyAI : MonoBehaviour
             }
         }
     }
+    /*
+    public void DetectNoise(Vector3 noisePosition, float intensity)
+    {
+        float adjustedHearingRadius = hearingRadius + intensity;
+        if (Vector3.Distance(transform.position, noisePosition) <= adjustedHearingRadius)
+        {
+            lastKnownNoisePosition = noisePosition;
+
+            // Debug log to confirm detection
+            Debug.Log("Enemy heard a noise at position: " + noisePosition + " with intensity: " + intensity);
+
+            // Visualize the noise detection position
+            Debug.DrawLine(transform.position, noisePosition, Color.yellow, 2f); // Line to noise source
+            Debug.DrawRay(noisePosition, Vector3.up * 2f, Color.red, 2f); // Indicator at noise source
+        }
+    } */
 
     public void DetectNoise(Vector3 noisePosition, float intensity)
     {
-        if (Vector3.Distance(transform.position, noisePosition) <= hearingRadius)
+        float detectionRange = hearingRadius + intensity;
+        float distanceToNoise = Vector3.Distance(transform.position, noisePosition);
+
+        if (distanceToNoise <= detectionRange)
         {
             lastKnownNoisePosition = noisePosition;
+            Debug.Log($"Enemy heard noise at {noisePosition} with intensity {intensity}");
         }
     }
 
