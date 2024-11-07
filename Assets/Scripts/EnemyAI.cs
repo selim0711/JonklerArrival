@@ -12,7 +12,8 @@ public class EnemyAI : MonoBehaviour
 
     [Header("Detection Settings")]
     [SerializeField] private Transform player;
-    [SerializeField] private LayerMask obstructionLayer;
+    [SerializeField] private LayerMask playerLayer;        // Assign this to "Player" layer in Inspector
+    [SerializeField] private LayerMask obstructionLayer;    // Set this to "Environment" layer in Inspector
 
     private NavMeshAgent navMeshAgent;
     private bool playerInSight;
@@ -49,10 +50,21 @@ public class EnemyAI : MonoBehaviour
 
             if (angleToPlayer < viewAngle / 2)
             {
-                if (!Physics.Raycast(transform.position, directionToPlayer, Vector3.Distance(transform.position, player.position), obstructionLayer))
+                // Use RaycastAll to ensure only player layer is hit, considering obstructions
+                RaycastHit[] hits = Physics.RaycastAll(transform.position, directionToPlayer, viewDistance);
+                foreach (RaycastHit hit in hits)
                 {
-                    playerInSight = true;
-                    lastKnownNoisePosition = Vector3.zero; // Reset noise tracking if player is seen
+                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+                    {
+                        playerInSight = true;
+                        lastKnownNoisePosition = Vector3.zero; // Reset noise tracking if player is seen
+                        break;
+                    }
+                    else if ((1 << hit.collider.gameObject.layer & obstructionLayer) != 0)
+                    {
+                        playerInSight = false;
+                        break;
+                    }
                 }
             }
         }
