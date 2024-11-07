@@ -11,7 +11,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float hearingRadius = 15f; // Increase if necessary
 
     [Header("Detection Settings")]
-    [SerializeField] private Transform player;
+    [SerializeField] public Transform player;
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask obstructionLayer;
 
