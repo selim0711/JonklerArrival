@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float lookSensitivity = 2f;
     [SerializeField] private float crouchHeight = 1f;
-    [SerializeField] private float standingHeight = 3f;
+    [SerializeField] private float standingHeight = 2f;
     [SerializeField] private Transform cameraTransform;
 
     [Header("Noise Settings")]

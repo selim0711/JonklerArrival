@@ -16,7 +16,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private LayerMask obstructionLayer;
 
     private NavMeshAgent navMeshAgent;
-    private bool playerInSight;
+    public bool playerInSight;
     private Vector3 lastKnownNoisePosition;
 
     private void Awake()
