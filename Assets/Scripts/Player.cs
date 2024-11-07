@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody>();
 
+    
         if (playerInput == null)
         {
             Debug.LogError("PlayerInput component is missing.");
