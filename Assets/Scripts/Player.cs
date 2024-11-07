@@ -28,53 +28,35 @@ public class Player : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody>();
 
-        if (playerInput != null)
-        {
-            moveAction = playerInput.actions["Move"];
-            jumpAction = playerInput.actions["Jump"];
-            sprintAction = playerInput.actions["Sprint"];
-            crouchAction = playerInput.actions["Crouch"];
-        }
-        else
+        if (playerInput == null)
         {
             Debug.LogError("PlayerInput component is missing.");
+            return;
         }
+
+        // Initialize input actions
+        moveAction = playerInput.actions["Move"];
+        jumpAction = playerInput.actions["Jump"];
+        sprintAction = playerInput.actions["Sprint"];
+        crouchAction = playerInput.actions["Crouch"];
     }
 
     private void OnEnable()
     {
-        if (jumpAction != null)
-            jumpAction.performed += OnJump;
-
-        if (sprintAction != null)
-        {
-            sprintAction.performed += ctx => isSprinting = true;
-            sprintAction.canceled += ctx => isSprinting = false;
-        }
-
-        if (crouchAction != null)
-        {
-            crouchAction.performed += StartCrouch;
-            crouchAction.canceled += StopCrouch;
-        }
+        jumpAction.performed += OnJump;
+        sprintAction.performed += StartSprint;
+        sprintAction.canceled += StopSprint;
+        crouchAction.performed += StartCrouch;
+        crouchAction.canceled += StopCrouch;
     }
 
     private void OnDisable()
     {
-        if (jumpAction != null)
-            jumpAction.performed -= OnJump;
-
-        if (sprintAction != null)
-        {
-            sprintAction.performed -= ctx => isSprinting = true;
-            sprintAction.canceled -= ctx => isSprinting = false;
-        }
-
-        if (crouchAction != null)
-        {
-            crouchAction.performed -= StartCrouch;
-            crouchAction.canceled -= StopCrouch;
-        }
+        jumpAction.performed -= OnJump;
+        sprintAction.performed -= StartSprint;
+        sprintAction.canceled -= StopSprint;
+        crouchAction.performed -= StartCrouch;
+        crouchAction.canceled -= StopCrouch;
     }
 
     private void Update()
@@ -101,17 +83,27 @@ public class Player : MonoBehaviour
         Vector2 lookInput = Mouse.current.delta.ReadValue();
         Vector2 lookDelta = lookInput * lookSensitivity * Time.deltaTime;
 
-        transform.Rotate(0f, lookDelta.x, 0f);
-        cameraTransform.Rotate(-lookDelta.y, 0f, 0f);
+        transform.Rotate(0f, lookDelta.x, 0f); // Horizontal rotation for player
+        cameraTransform.Rotate(-lookDelta.y, 0f, 0f); // Vertical rotation for camera
     }
 
-    public void OnJump(InputAction.CallbackContext context)
+    private void OnJump(InputAction.CallbackContext context)
     {
         if (isGrounded && !isCrouching) // Prevent jumping while crouched
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
+    }
+
+    private void StartSprint(InputAction.CallbackContext context)
+    {
+        isSprinting = true;
+    }
+
+    private void StopSprint(InputAction.CallbackContext context)
+    {
+        isSprinting = false;
     }
 
     private void StartCrouch(InputAction.CallbackContext context)
