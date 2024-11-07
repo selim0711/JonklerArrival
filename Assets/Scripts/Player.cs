@@ -12,6 +12,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float standingHeight = 2f;
     [SerializeField] private Transform cameraTransform;
 
+    [Header("Noise Settings")]
+    [SerializeField] private float walkNoiseIntensity = 1f;
+    [SerializeField] private float sprintNoiseIntensity = 3f;
+    [SerializeField] private float crouchNoiseIntensity = 0.5f;
+
     private PlayerInput playerInput;
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -34,7 +39,6 @@ public class Player : MonoBehaviour
             return;
         }
 
-        // Initialize input actions
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
         sprintAction = playerInput.actions["Sprint"];
@@ -63,6 +67,7 @@ public class Player : MonoBehaviour
     {
         HandleMovement();
         HandleLook();
+        EmitNoiseBasedOnMovement();
     }
 
     private void HandleMovement()
@@ -83,16 +88,17 @@ public class Player : MonoBehaviour
         Vector2 lookInput = Mouse.current.delta.ReadValue();
         Vector2 lookDelta = lookInput * lookSensitivity * Time.deltaTime;
 
-        transform.Rotate(0f, lookDelta.x, 0f); // Horizontal rotation for player
-        cameraTransform.Rotate(-lookDelta.y, 0f, 0f); // Vertical rotation for camera
+        transform.Rotate(0f, lookDelta.x, 0f);
+        cameraTransform.Rotate(-lookDelta.y, 0f, 0f);
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        if (isGrounded && !isCrouching) // Prevent jumping while crouched
+        if (isGrounded && !isCrouching)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
+            MakeNoise(sprintNoiseIntensity); // Jumping creates a louder noise
         }
     }
 
@@ -121,8 +127,33 @@ public class Player : MonoBehaviour
     private void AdjustHeight(float height)
     {
         Vector3 scale = transform.localScale;
-        scale.y = height / standingHeight; // Adjust the scale proportionally
+        scale.y = height / standingHeight;
         transform.localScale = scale;
+    }
+
+    private void EmitNoiseBasedOnMovement()
+    {
+        if (moveAction.ReadValue<Vector2>().magnitude > 0) // Only emit noise if moving
+        {
+            if (isSprinting)
+                MakeNoise(sprintNoiseIntensity);
+            else if (isCrouching)
+                MakeNoise(crouchNoiseIntensity);
+            else
+                MakeNoise(walkNoiseIntensity);
+        }
+    }
+
+    private void MakeNoise(float intensity)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, intensity);
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.TryGetComponent(out EnemyAI enemyAI))
+            {
+                enemyAI.DetectNoise(transform.position, intensity);
+            }
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
