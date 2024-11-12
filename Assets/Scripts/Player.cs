@@ -159,18 +159,6 @@ public class Player : MonoBehaviour
             }
         }
     }
-    /*
-    private void MakeNoise(float intensity)
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, intensity);
-        foreach (var hitCollider in hitColliders)
-        {
-            if (hitCollider.TryGetComponent(out EnemyAI enemyAI))
-            {
-                enemyAI.DetectNoise(transform.position, intensity);
-            }
-        }
-    }*/
 
     private void OnCollisionEnter(Collision collision)
     {

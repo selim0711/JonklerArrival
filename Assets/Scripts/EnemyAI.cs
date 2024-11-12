@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,32 +9,53 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float viewAngle = 45f;
 
     [Header("Hearing Settings")]
-    [SerializeField] private float hearingRadius = 15f; // Increase if necessary
+    [SerializeField] private float hearingRadius = 15f;
 
     [Header("Detection Settings")]
     [SerializeField] public Transform player;
     [SerializeField] private LayerMask playerLayer;
     [SerializeField] private LayerMask obstructionLayer;
 
+    [Header("Patrol Settings")]
+    [SerializeField] private List<Transform> patrolPoints;
+    [SerializeField] private float waitTimeAtPatrolPoint = 2f;
+    [SerializeField] private float patrolSpeed = 3f;
+    [SerializeField] private float pursueSpeed = 6f;
+
     private NavMeshAgent navMeshAgent;
     public bool playerInSight;
     private Vector3 lastKnownNoisePosition;
+    private Transform currentPatrolPoint;
+    private bool isWaiting;
+    private float waitTimer;
 
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.speed = patrolSpeed; // Set initial speed to patrol speed
     }
 
     private void Update()
     {
         CheckSight();
+
         if (playerInSight)
         {
+            // Pursue the player if in sight
+            navMeshAgent.speed = pursueSpeed;
             MoveTowards(player.position);
         }
         else if (lastKnownNoisePosition != Vector3.zero)
         {
+            // Move towards the last known noise position if heard
+            navMeshAgent.speed = pursueSpeed;
             MoveTowards(lastKnownNoisePosition);
+        }
+        else
+        {
+            // Patrol if no player in sight or noise detected
+            navMeshAgent.speed = patrolSpeed;
+            Patrol();
         }
     }
 
@@ -68,22 +90,40 @@ public class EnemyAI : MonoBehaviour
             }
         }
     }
-    /*
-    public void DetectNoise(Vector3 noisePosition, float intensity)
+
+    private void Patrol()
     {
-        float adjustedHearingRadius = hearingRadius + intensity;
-        if (Vector3.Distance(transform.position, noisePosition) <= adjustedHearingRadius)
+        if (navMeshAgent.remainingDistance <= 0.5f && !isWaiting)
         {
-            lastKnownNoisePosition = noisePosition;
-
-            // Debug log to confirm detection
-            Debug.Log("Enemy heard a noise at position: " + noisePosition + " with intensity: " + intensity);
-
-            // Visualize the noise detection position
-            Debug.DrawLine(transform.position, noisePosition, Color.yellow, 2f); // Line to noise source
-            Debug.DrawRay(noisePosition, Vector3.up * 2f, Color.red, 2f); // Indicator at noise source
+            // When reaching a patrol point, start waiting
+            isWaiting = true;
+            waitTimer = waitTimeAtPatrolPoint;
+            navMeshAgent.ResetPath();
         }
-    } */
+
+        if (isWaiting)
+        {
+            waitTimer -= Time.deltaTime;
+            if (waitTimer <= 0f)
+            {
+                isWaiting = false;
+                ChooseRandomPatrolPoint();
+            }
+        }
+    }
+
+    private void ChooseRandomPatrolPoint()
+    {
+        // Select a random patrol point from the list, avoiding the current point
+        Transform nextPatrolPoint;
+        do
+        {
+            nextPatrolPoint = patrolPoints[Random.Range(0, patrolPoints.Count)];
+        } while (nextPatrolPoint == currentPatrolPoint);
+
+        currentPatrolPoint = nextPatrolPoint;
+        navMeshAgent.SetDestination(currentPatrolPoint.position);
+    }
 
     public void DetectNoise(Vector3 noisePosition, float intensity)
     {
