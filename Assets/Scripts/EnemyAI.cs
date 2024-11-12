@@ -39,6 +39,11 @@ public class EnemyAI : MonoBehaviour
 
     private void CheckSight()
     {
+        if (playerInSight && Vector3.Distance(player.position, this.transform.position) <= 2) 
+        {
+            return;
+        }
+
         playerInSight = false;
         if (player == null) return;
 

@@ -5264,17 +5264,37 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1955650224}
+    - target: {fileID: 2368279126761525798, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
+      propertyPath: viewAngle
+      value: 160
+      objectReference: {fileID: 0}
+    - target: {fileID: 2368279126761525798, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
+      propertyPath: viewDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8641455
+      objectReference: {fileID: 0}
+    - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8641455
+      objectReference: {fileID: 0}
+    - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8641455
+      objectReference: {fileID: 0}
     - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: m_LocalPosition.x
       value: 88.57
       objectReference: {fileID: 0}
     - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.15
+      value: -0.013
       objectReference: {fileID: 0}
     - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.92
+      value: 8.045
       objectReference: {fileID: 0}
     - target: {fileID: 2629588094303884814, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5306,11 +5326,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6686270024943765620, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: MaxDistance
-      value: 15.237473
+      value: 18.042564
       objectReference: {fileID: 0}
     - target: {fileID: 6686270024943765620, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: MinDistance
-      value: 9.816171
+      value: 13.8003845
       objectReference: {fileID: 0}
     - target: {fileID: 8018858667771589230, guid: 10b8abc2df8a4d541bf58dff551f9107, type: 3}
       propertyPath: m_Name
