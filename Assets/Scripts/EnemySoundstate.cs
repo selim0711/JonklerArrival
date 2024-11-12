@@ -22,43 +22,62 @@ public class EnemySoundstate : MonoBehaviour
     private void Start()
     {
         enemyAI = GetComponent<EnemyAI>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>(); // Add an AudioSource if one isn't assigned
+        }
         audioSource.loop = false; // Default to non-looping
         ChangeAudioState(JoinklerAudioStates.Idle); // Start with idle audio
     }
 
     private void Update()
     {
-        // Check enemy AI state and update sound accordingly
-        if (enemyAI.playerInSight && currentState != JoinklerAudioStates.SeenPlayer && currentState != JoinklerAudioStates.Hunting)
+        HandleAudioState();
+    }
+
+    private void HandleAudioState()
+    {
+        if (enemyAI.playerInSight)
         {
-            ChangeAudioState(JoinklerAudioStates.SeenPlayer);
+            if (currentState != JoinklerAudioStates.SeenPlayer && currentState != JoinklerAudioStates.Hunting)
+            {
+                ChangeAudioState(JoinklerAudioStates.SeenPlayer);
+            }
+            else if (currentState == JoinklerAudioStates.SeenPlayer && !audioSource.isPlaying)
+            {
+                ChangeAudioState(JoinklerAudioStates.Hunting);
+            }
         }
-        else if (!enemyAI.playerInSight && (currentState == JoinklerAudioStates.SeenPlayer || currentState == JoinklerAudioStates.Hunting))
+        else if (!enemyAI.playerInSight && (currentState == JoinklerAudioStates.Hunting || currentState == JoinklerAudioStates.SeenPlayer))
         {
             ChangeAudioState(JoinklerAudioStates.LostPlayer);
         }
-
-        UpdateSoundState();
+        else if (currentState == JoinklerAudioStates.LostPlayer && !audioSource.isPlaying)
+        {
+            ChangeAudioState(JoinklerAudioStates.Idle);
+        }
     }
 
     private void ChangeAudioState(JoinklerAudioStates newState)
     {
+        if (currentState == newState) return;
+
+        Debug.Log($"Transitioning from {currentState} to {newState}");
         currentState = newState;
 
-        // Stop the current audio clip if it's playing
-        if (audioSource.isPlaying)
-            audioSource.Stop();
+        if (audioSource.isPlaying) audioSource.Stop();
 
-        // Select the appropriate audio clip based on the state
         AudioClip newClip = GetClipForState(newState);
         if (newClip != null)
         {
             audioSource.clip = newClip;
 
-            // Enable looping only if the state is Hunting
             audioSource.loop = (newState == JoinklerAudioStates.Hunting);
-
             audioSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning($"No audio clip assigned for state {newState}");
         }
     }
 
@@ -76,22 +95,6 @@ public class EnemySoundstate : MonoBehaviour
                 return lostPlayerClip;
             default:
                 return null;
-        }
-    }
-
-    private void UpdateSoundState()
-    {
-        // If the clip finishes, transition to the continuous state as needed
-        if (!audioSource.isPlaying && !audioSource.loop)
-        {
-            if (currentState == JoinklerAudioStates.SeenPlayer)
-            {
-                ChangeAudioState(JoinklerAudioStates.Hunting); // Switch to hunting after player is seen
-            }
-            else if (currentState == JoinklerAudioStates.LostPlayer)
-            {
-                ChangeAudioState(JoinklerAudioStates.Idle); // Return to idle if player is lost
-            }
         }
     }
 }
