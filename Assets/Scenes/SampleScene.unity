@@ -5717,10 +5717,22 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2564024230998115056, guid: d8cb682dd05144449913d735cdc252aa, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3645547118740374438, guid: d8cb682dd05144449913d735cdc252aa, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4876503225086768467, guid: d8cb682dd05144449913d735cdc252aa, type: 3}
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 380992903}
+    - target: {fileID: 5751006222508879072, guid: d8cb682dd05144449913d735cdc252aa, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8723963191510476017, guid: d8cb682dd05144449913d735cdc252aa, type: 3}
       propertyPath: m_Camera
       value: 
