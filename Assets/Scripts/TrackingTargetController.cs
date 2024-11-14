@@ -1,20 +1,37 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TrackingTargetController : MonoBehaviour
 {
     [SerializeField] private float verticalSensitivity = 2f;
+    [SerializeField] private float maxVerticalAngle = 80f; // Maximaler Winkel nach oben/unten
+
     private float verticalRotation = 0f;
+    private InputAction lookAction;
+
+    private void Awake()
+    {
+        // Initialisiere die InputAction für die Mausbewegung (Look)
+        lookAction = new InputAction(type: InputActionType.Value, binding: "<Mouse>/delta");
+        lookAction.Enable();
+    }
+
+    private void OnDestroy()
+    {
+        // Deaktiviert die InputAction, um Speicher freizugeben
+        lookAction.Disable();
+    }
 
     private void Update()
     {
-        // Get the vertical input from the mouse
-        float verticalInput = Input.GetAxis("Mouse Y");
+        // Lese den Maus-Input
+        Vector2 lookInput = lookAction.ReadValue<Vector2>();
 
-        // Adjust the vertical rotation based on input
-        verticalRotation -= verticalInput * verticalSensitivity;
-        verticalRotation = Mathf.Clamp(verticalRotation, -80f, 80f); // Limits vertical rotation
+        // Berechne die vertikale Rotation (Y-Komponente des Maus-Delta)
+        verticalRotation -= lookInput.y * verticalSensitivity * Time.deltaTime;
+        verticalRotation = Mathf.Clamp(verticalRotation, -maxVerticalAngle, maxVerticalAngle);
 
-        // Apply rotation to the Tracking Target
+        // Setze die Rotation des GameObjects in der lokalen X-Achse
         transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
     }
 }

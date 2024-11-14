@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -18,6 +20,19 @@ public class Player : MonoBehaviour
     [SerializeField] private float crouchNoiseIntensity = 1f;
     [SerializeField] private float jumpNoiseIntensity = 15f;
 
+    [Header("Stamina Settings")]
+    [SerializeField] private float maxStamina = 100f;
+    [SerializeField] private float staminaDrainRate = 15f;
+    [SerializeField] private float staminaRegenRate = 10f;
+    private float currentStamina;
+
+    [Header("UI Elements")]
+    [SerializeField] private Slider staminaBar;
+    [SerializeField] private CanvasGroup staminaBarCanvasGroup;
+    [SerializeField] private float fadeDuration = 0.5f;
+    [SerializeField] private float fadeOutDelay = 2f;
+
+
     private PlayerInput playerInput;
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -28,6 +43,10 @@ public class Player : MonoBehaviour
     private bool isGrounded;
     private bool isSprinting;
     private bool isCrouching;
+    private bool isMoving;
+
+    private Coroutine fadeCoroutine;
+    private bool isFadingOut = false;
 
     [SerializeField] private LayerMask enemyLayer;
 
@@ -35,8 +54,8 @@ public class Player : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody>();
+        currentStamina = maxStamina; // Initialize stamina to max
 
-    
         if (playerInput == null)
         {
             Debug.LogError("PlayerInput component is missing.");
@@ -72,22 +91,56 @@ public class Player : MonoBehaviour
         HandleMovement();
         HandleLook();
         EmitNoiseBasedOnMovement();
+        HandleStamina();
+        UpdateStaminaUI();
     }
 
     private void HandleMovement()
     {
         Vector2 moveInput = moveAction.ReadValue<Vector2>();
-        float currentSpeed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
+        float currentSpeed = isCrouching ? crouchSpeed : (isSprinting && currentStamina > 0 ? sprintSpeed : walkSpeed);
 
         Vector3 direction = new Vector3(moveInput.x, 0f, moveInput.y);
         direction = cameraTransform.forward * direction.z + cameraTransform.right * direction.x;
         direction.y = 0f;
 
+        isMoving = moveInput.magnitude > 0;
+
         Vector3 moveVelocity = direction * currentSpeed * Time.deltaTime;
         rb.MovePosition(rb.position + moveVelocity);
     }
 
-    private void HandleLook()
+    private void HandleStamina()
+    {
+        if (isSprinting && isMoving && currentStamina > 0)
+        {
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+
+            if (currentStamina <= 0)
+            {
+                StopSprint(new InputAction.CallbackContext());
+            }
+
+            UpdateStaminaUI();
+        }
+        else if (currentStamina < maxStamina)
+        {
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina);
+            UpdateStaminaUI();
+        }
+    }
+
+    private void UpdateStaminaUI()
+    {
+        if (staminaBar != null)
+        {
+            staminaBar.value = currentStamina / maxStamina;
+        }
+    }
+
+   private void HandleLook()
     {
         Vector2 lookInput = Mouse.current.delta.ReadValue();
         Vector2 lookDelta = lookInput * lookSensitivity * Time.deltaTime;
@@ -108,13 +161,53 @@ public class Player : MonoBehaviour
 
     private void StartSprint(InputAction.CallbackContext context)
     {
-        isSprinting = true;
+        if (currentStamina > 0)
+        {
+            isSprinting = true;
+            ShowStaminaBar();
+        }
     }
 
     private void StopSprint(InputAction.CallbackContext context)
     {
         isSprinting = false;
+        HideStaminaBar();
     }
+
+    private void ShowStaminaBar()
+    {
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+        }
+        fadeCoroutine = StartCoroutine(FadeStaminaBar(1f));
+    }
+
+    private void HideStaminaBar()
+    {
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+        }
+        fadeCoroutine = StartCoroutine(FadeStaminaBar(0f, fadeOutDelay));
+    }
+
+    private IEnumerator FadeStaminaBar(float targetAlpha, float delay = 0f)
+    {
+        yield return new WaitForSeconds(delay);
+        float startAlpha = staminaBarCanvasGroup.alpha;
+        float time = 0f;
+
+        while (time < fadeDuration)
+        {
+            time += Time.deltaTime;
+            staminaBarCanvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / fadeDuration);
+            yield return null;
+        }
+
+        staminaBarCanvasGroup.alpha = targetAlpha;
+    }
+
 
     private void StartCrouch(InputAction.CallbackContext context)
     {
