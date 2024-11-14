@@ -1,3 +1,5 @@
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,6 +7,8 @@ public class PlayerBeatbox : MonoBehaviour
 {
     [SerializeField]
     public RawImage rawImage = null;
+
+    private bool isBeatboxActive = false;
 
     public float startingValueY = 0;
     public int curveWidth = 10;
@@ -15,14 +19,23 @@ public class PlayerBeatbox : MonoBehaviour
     public Color32 BeatboxPlayerColor = new Color32(255, 0, 0, 255);
     private Color32 transparentColor = new Color32(0, 0, 0, 0);
 
-    private float TimeToBeatbox = 0.0f;
+    [SerializeField, Header("The Maximum Time the player has time to Beatbox")]
+    private float MaxTimeToBeatbox = 10.0f;
     private float CurrentTimeToBeatbox = 0.0f;
 
     private float LoudnessToFollow = 0.0f;
     private float PlayerLoudness = 0.0f;
 
-    private float BeatboxAccuracy = 1.0f;
+    [SerializeField, Header("The Maximum Accuracy the player can reach")]
+    private float MaxBeatboxAccuracy = 1.0f;
+
+    [SerializeField, Header("The Minimum Percantage Accuracy the player has to reach"), MinMaxRangeSlider(0, 1)]
+    private float MinBeatboxAccuracy = 1.0f;
+
     public float PlayerBeatboxAccuracy = 0.0f;
+
+    [SerializeField, Header("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
+    private float EnemyStunTime = 2.0f;
 
     public float intensity = 1.0f;
 
@@ -48,8 +61,51 @@ public class PlayerBeatbox : MonoBehaviour
         rawImage.enabled = true;
     }
 
+    public void ActivateEvent()
+    {
+        isBeatboxActive = true;
+        CurrentTimeToBeatbox = 0;
+    }
+
+    private void StunJoinkler(bool earlyBonus) //Implement Stunning Logic: Add State to Joinkler Class to Stun him, with time
+    {
+        float stunTime = this.EnemyStunTime * (earlyBonus ? 1.5f : 1.0f);
+    }
+
+    private void KillPlayer() //Implement Killing Logic: Animation and States
+    {
+
+    }
+
     void Update()
     {
+        if (!isBeatboxActive)
+        {
+            return;
+        }
+            
+
+        if(CurrentTimeToBeatbox >= MaxTimeToBeatbox)
+        {
+            if (PlayerBeatboxAccuracy >= MinBeatboxAccuracy)
+            {
+                StunJoinkler(false);
+            }
+            else
+            {
+                KillPlayer();
+            }
+        }
+        else
+        {
+            CurrentTimeToBeatbox += Time.deltaTime;
+
+            if (PlayerBeatboxAccuracy >= MaxBeatboxAccuracy) //if player reaches Maximum Accuracy, end early
+            {
+                StunJoinkler(true);
+            }
+        }
+
         if (DrawTime >= 0.0f)
         {
             DrawTime = 0;
