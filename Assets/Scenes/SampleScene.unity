@@ -3490,17 +3490,17 @@ AudioReverbZone:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1725188432}
   m_Enabled: 1
-  m_MinDistance: 47.442722
-  m_MaxDistance: 175.83438
-  m_ReverbPreset: 9
+  m_MinDistance: 1000
+  m_MaxDistance: 1000
+  m_ReverbPreset: 12
   m_Room: -1000
-  m_RoomHF: 0
-  m_DecayTime: 2.91
-  m_DecayHFRatio: 1.3
-  m_Reflections: -602
-  m_ReflectionsDelay: 0.015
-  m_Reverb: -302
-  m_ReverbDelay: 0.022
+  m_RoomHF: -4000
+  m_DecayTime: 0.3
+  m_DecayHFRatio: 0.1
+  m_Reflections: -1831
+  m_ReflectionsDelay: 0.002
+  m_Reverb: -1630
+  m_ReverbDelay: 0.03
   m_HFReference: 5000
   m_Diffusion: 100
   m_Density: 100
@@ -5633,6 +5633,66 @@ PrefabInstance:
     - target: {fileID: 5326597707977390389, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
       propertyPath: m_Name
       value: Jonkler
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: MaxDistance
+      value: 9.571716
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: MinDistance
+      value: 5.1812363
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[0].time
+      value: 0.36413574
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: spreadCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[0].inSlope
+      value: -2.0008
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[1].inSlope
+      value: -0.5002
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[0].inWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[0].outSlope
+      value: -2.0008
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[1].inWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[1].outSlope
+      value: -0.5002
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[0].outWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: rolloffCustomCurve.m_Curve.Array.data[1].outWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901460108740587282, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
+      propertyPath: reverbZoneMixCustomCurve.m_Curve.Array.data[0].value
+      value: 1.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
