@@ -1,6 +1,4 @@
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class PlayerBeatbox : MonoBehaviour
@@ -12,9 +10,10 @@ public class PlayerBeatbox : MonoBehaviour
     public int curveWidth = 10;
 
     private Texture2D canvas = null;
+    private Color32[] clearColors;
 
-    public Color BeatboxPlayerColor = Color.red;
-    private Color[] clearColors;
+    public Color32 BeatboxPlayerColor = new Color32(255, 0, 0, 255);
+    private Color32 transparentColor = new Color32(0, 0, 0, 0);
 
     private float TimeToBeatbox = 0.0f;
     private float CurrentTimeToBeatbox = 0.0f;
@@ -28,77 +27,77 @@ public class PlayerBeatbox : MonoBehaviour
     public float intensity = 1.0f;
 
     private float DrawTime = 0.0f;
+    private Color32[] pixelBuffer;
 
     void Start()
     {
-        Color transparentColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-        canvas = new Texture2D((int)rawImage.rectTransform.rect.width, (int)rawImage.rectTransform.rect.height);
+        int canvasWidth = (int)rawImage.rectTransform.rect.width;
+        int canvasHeight = (int)rawImage.rectTransform.rect.height;
 
-        clearColors = new Color[canvas.width * canvas.height];
+        canvas = new Texture2D(canvasWidth, canvasHeight, TextureFormat.RGBA32, false);
+        rawImage.texture = canvas;
 
+        clearColors = new Color32[canvasWidth * canvasHeight];
         for (int i = 0; i < clearColors.Length; i++)
         {
             clearColors[i] = transparentColor;
         }
 
-        canvas.SetPixels(clearColors);
-        canvas.Apply();
+        pixelBuffer = new Color32[canvasWidth * canvasHeight];
+        ResetCanvas();
+        rawImage.enabled = true;
     }
 
     void Update()
     {
-        if (this.DrawTime >= 0.0)
+        if (DrawTime >= 0.0f)
         {
-            this.DrawTime = 0;
+            DrawTime = 0;
             DrawSinusCurve();
         }
         else
-            this.DrawTime += Time.deltaTime;
+        {
+            DrawTime += Time.deltaTime;
+        }
     }
 
     private void DrawSinusCurve()
-    { 
-        float CanvasHeight = canvas.height;
-        float CanvasWidth = canvas.width;
+    {
+        int canvasHeight = canvas.height;
+        int canvasWidth = canvas.width;
+        float frequency = 2.0f * Mathf.PI * intensity;
 
-        const float base_frequency = 2.0f * Mathf.PI;
-        float frequency = base_frequency * intensity;
-
-        canvas.SetPixels(clearColors);
-        canvas.Apply();
-
-        Color[] pixels = canvas.GetPixels();
+        System.Array.Copy(clearColors, pixelBuffer, pixelBuffer.Length);
 
         int halfWidth = curveWidth / 2;
+        float offset = (startingValueY * 100);
 
-        float valueFF = (startingValueY * 100);
-
-        for (int x = 0; x < CanvasWidth; x++)
+        for (int x = 0; x < canvasWidth; x++)
         {
-            float radians = (x / (float)CanvasWidth) * frequency * 4;
-            int y = Mathf.RoundToInt(Mathf.Sin(radians + valueFF) * (CanvasHeight / 4) + (CanvasHeight / 2));
+            float radians = (x / (float)canvasWidth) * frequency;
+            int y = Mathf.RoundToInt(Mathf.Sin(radians + offset) * (canvasHeight / 4) + (canvasHeight / 2));
 
+            int baseIndex = y * canvasWidth + x;
             for (int i = -halfWidth; i <= halfWidth; i++)
             {
                 int newY = y + i;
-
-                if (newY >= 0 && newY < CanvasHeight)
+                if (newY >= 0 && newY < canvasHeight)
                 {
-                    pixels[newY * Mathf.RoundToInt(CanvasWidth) + x] = this.BeatboxPlayerColor;
+                    pixelBuffer[newY * canvasWidth + x] = BeatboxPlayerColor;
                 }
             }
         }
 
-        this.startingValueY += 0.1f * (Time.deltaTime);
+        startingValueY += 0.1f * Time.deltaTime;
+        if (startingValueY > 1) startingValueY = -1;
 
-        if (this.startingValueY > 1)
-            this.startingValueY = -1;
-
-        canvas.SetPixels(pixels);
+        canvas.SetPixels32(pixelBuffer);
         canvas.Apply();
-
-        rawImage.texture = canvas;
     }
 
-
+    private void ResetCanvas()
+    {
+        canvas.SetPixels32(clearColors);
+        canvas.Apply();
+    }
 }
