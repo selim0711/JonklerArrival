@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     private InputAction jumpAction;
     private InputAction sprintAction;
     private InputAction crouchAction;
+    private InputAction mouseLockAction;
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -66,6 +67,11 @@ public class Player : MonoBehaviour
         jumpAction = playerInput.actions["Jump"];
         sprintAction = playerInput.actions["Sprint"];
         crouchAction = playerInput.actions["Crouch"];
+        mouseLockAction = playerInput.actions["MouseLock"];
+
+        // Lock cursor when the game starts
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void OnEnable()
@@ -75,6 +81,8 @@ public class Player : MonoBehaviour
         sprintAction.canceled += StopSprint;
         crouchAction.performed += StartCrouch;
         crouchAction.canceled += StopCrouch;
+        mouseLockAction.performed += ToggleCursorLock;
+
     }
 
     private void OnDisable()
@@ -84,6 +92,7 @@ public class Player : MonoBehaviour
         sprintAction.canceled -= StopSprint;
         crouchAction.performed -= StartCrouch;
         crouchAction.canceled -= StopCrouch;
+        mouseLockAction.performed -= ToggleCursorLock;
     }
 
     private void Update()
@@ -93,6 +102,20 @@ public class Player : MonoBehaviour
         EmitNoiseBasedOnMovement();
         HandleStamina();
         UpdateStaminaUI();
+    }
+
+    private void ToggleCursorLock(InputAction.CallbackContext context)
+    {
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void HandleMovement()
