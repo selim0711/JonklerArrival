@@ -45,7 +45,7 @@
                     "name": "Crouch",
                     "type": "Button",
                     "id": "27c5f898-bc57-4ee1-8800-db469aca5fe3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -99,6 +99,15 @@
                     "name": "MouseLock",
                     "type": "Button",
                     "id": "60f006f0-3ac7-4802-b5ce-35caffbcbb67",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "F_Action",
+                    "type": "Button",
+                    "id": "e704e964-1574-456f-b73c-7cd4614d268c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -510,6 +519,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseLock",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bf22a637-db58-473b-b3cb-aa9c31e94262",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "F_Action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
