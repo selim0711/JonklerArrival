@@ -50,10 +50,7 @@ namespace SojaExiles
                     }
                 }
             }
-            else
-            {
-                Debug.Log("No interactable object within range.");
-            }
+
         }
 
         IEnumerator Opening()

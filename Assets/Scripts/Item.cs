@@ -1,9 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
-public class Item : ScriptableObject
+public class Item : MonoBehaviour
 {
-    public string itemName;
-    public Sprite icon;
-    public bool isEquipped = false;
+    public string itemName; // Name des Items (muss mit dem Prefab-Namen übereinstimmen)
+    public Sprite itemIcon; // Icon des Items
 }

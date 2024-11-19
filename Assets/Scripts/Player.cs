@@ -32,6 +32,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float fadeOutDelay = 2f;
 
+    [Header("Inventory Settings")]
+    [SerializeField] private GameObject inventoryUI; // Das Inventar-UI
+    [SerializeField] private TrackingTargetController trackingTargetController; // Referenz zum TrackingTargetController
+    private bool isInventoryOpen = false; // Status des Inventars
 
     private PlayerInput playerInput;
     private InputAction moveAction;
@@ -39,6 +43,7 @@ public class Player : MonoBehaviour
     private InputAction sprintAction;
     private InputAction crouchAction;
     private InputAction mouseLockAction;
+    private InputAction inventoryAction; 
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -68,6 +73,7 @@ public class Player : MonoBehaviour
         sprintAction = playerInput.actions["Sprint"];
         crouchAction = playerInput.actions["Crouch"];
         mouseLockAction = playerInput.actions["MouseLock"];
+        inventoryAction = playerInput.actions["Inventory"];
 
         // Lock cursor when the game starts
         Cursor.lockState = CursorLockMode.Locked;
@@ -82,7 +88,7 @@ public class Player : MonoBehaviour
         crouchAction.performed += StartCrouch;
         crouchAction.canceled += StopCrouch;
         mouseLockAction.performed += ToggleCursorLock;
-
+        inventoryAction.performed += ToggleInventory; // Inventar-Steuerung
     }
 
     private void OnDisable()
@@ -93,15 +99,45 @@ public class Player : MonoBehaviour
         crouchAction.performed -= StartCrouch;
         crouchAction.canceled -= StopCrouch;
         mouseLockAction.performed -= ToggleCursorLock;
+        inventoryAction.performed -= ToggleInventory;
     }
 
     private void Update()
     {
-        HandleMovement();
-        HandleLook();
+        if (!isInventoryOpen) // Nur wenn das Inventar geschlossen ist, erlauben wir Bewegung und Kamera
+        {
+            HandleMovement();
+            HandleLook();
+        }
         EmitNoiseBasedOnMovement();
         HandleStamina();
         UpdateStaminaUI();
+    }
+    private void ToggleInventory(InputAction.CallbackContext context)
+    {
+        isInventoryOpen = !isInventoryOpen;
+
+        // Inventar-UI ein-/ausblenden
+        inventoryUI.SetActive(isInventoryOpen);
+
+        if (isInventoryOpen)
+        {
+            // Maus aktivieren und TrackingTargetController deaktivieren
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            if (trackingTargetController != null)
+                trackingTargetController.enabled = false; // Tracking deaktivieren
+        }
+        else
+        {
+            // Maus deaktivieren und TrackingTargetController aktivieren
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            if (trackingTargetController != null)
+                trackingTargetController.enabled = true; // Tracking aktivieren
+        }
     }
 
     private void ToggleCursorLock(InputAction.CallbackContext context)

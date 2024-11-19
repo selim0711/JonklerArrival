@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4696431447860929160}
   - component: {fileID: 5599776160168734718}
   - component: {fileID: 1807767921335855056}
+  - component: {fileID: 2646993444958606580}
   m_Layer: 0
   m_Name: DoorInner
   m_TagString: Untagged
@@ -149,6 +150,22 @@ MonoBehaviour:
   open: 0
   player: {fileID: 0}
   interactionRange: 10
+--- !u!208 &2646993444958606580
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537710022629362021}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.043, y: 1.419, z: 0.71300006}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.043, y: 0.057000004, z: 0.711}
+  m_TimeToStationary: 0.5
 --- !u!1 &3650941986571458721
 GameObject:
   m_ObjectHideFlags: 0
