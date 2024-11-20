@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: FlashLight
-  itemIcon: {fileID: 21300000, guid: feeba914b4ff40e428683c88d2340241, type: 3}
+  itemIcon: {fileID: 21300000, guid: e3a6c59e3477fb245b108b4a65d32757, type: 3}
 --- !u!54 &1731992223635636112
 Rigidbody:
   m_ObjectHideFlags: 0

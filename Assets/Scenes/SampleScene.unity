@@ -1681,7 +1681,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 3.2039413
+  MaxDistance: 5
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0
@@ -2740,6 +2740,8 @@ MonoBehaviour:
   patrolSpeed: 3
   pursueSpeed: 6
   playerInSight: 0
+  isJoinklerStunned: 0
+  TestTrigger_Stun: 0
 --- !u!136 &644523479
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3334,6 +3336,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FlashLight
       objectReference: {fileID: 0}
+    - target: {fileID: 6385511563048687752, guid: 04035d2f78cf12346a95fe1ebc2576f2, type: 3}
+      propertyPath: itemIcon
+      value: 
+      objectReference: {fileID: 21300000, guid: e3a6c59e3477fb245b108b4a65d32757, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -9649,13 +9655,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5062592381773735961}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0d142c4ff8dfe64abd0e1cdef6f5ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rawImage: {fileID: 7423505999757699561}
-  startingValueY: 0
+  joinklerAI: {fileID: 0}
+  targetRenderImage: {fileID: 0}
   curveWidth: 10
   BeatboxPlayerColor:
     serializedVersion: 2
@@ -9663,9 +9669,7 @@ MonoBehaviour:
   MaxTimeToBeatbox: 10
   MaxBeatboxAccuracy: 1
   MinBeatboxAccuracy: 1
-  PlayerBeatboxAccuracy: 0
   EnemyStunTime: 2
-  intensity: 99.15
 --- !u!114 &239471456336074235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10525,7 +10529,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4906487878020830755, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.87
+      value: 9.49
       objectReference: {fileID: 0}
     - target: {fileID: 4906487878020830755, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
       propertyPath: m_LocalRotation.w

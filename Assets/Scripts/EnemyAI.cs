@@ -21,24 +21,27 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float waitTimeAtPatrolPoint = 2f;
     [SerializeField] private float patrolSpeed = 3f;
     [SerializeField] private float pursueSpeed = 6f;
-
+    
     private NavMeshAgent navMeshAgent;
     public bool playerInSight;
     private Vector3 lastKnownNoisePosition;
     private Transform currentPatrolPoint;
     private bool isWaiting;
     private float waitTimer;
-
+    [SerializeField]
     private bool isJoinklerStunned = false;
     private bool hasPlayedStunAnim = false;
 
     private float joinklerStunnedTimeCurrent = 0.0f;
-    private float joinklerStunnedTime = 0.0f;
+    private double joinklerStunnedTime = 2f;
 
     private bool isKillingPlayer = false;
     private bool hasPlayedKillingAnim = false; // is set to true after Killing Animation has finished
     private bool hasKilledPlayer = false;
 
+
+    [SerializeField]
+    private bool TestTrigger_Stun = false;
 
 
     private void Awake()
@@ -49,13 +52,22 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if(TestTrigger_Stun)
+        {
+            TestTrigger_Stun = false;
+
+            this.StunJoinkler(4.7);
+        }
+
         if(isKillingPlayer) //Play Animation for Joinkler Killing Player. TODO: Add Animation Logic for Killing Player
         {
             if (!hasPlayedKillingAnim)
             {
                 //TODO:
                 //Set Animation State Killing Player
-                //JoinklerAnim.SetBool("Kill_Player", true);
+                //EnemyAnim.SetBool("Kill_Player", true);
+
+               
 
                 hasPlayedKillingAnim = true;
                 return;
@@ -67,26 +79,14 @@ public class EnemyAI : MonoBehaviour
         }
 
 
-        if(isJoinklerStunned) // Joinkler has been stunned, skip Updating. TODO: ADD STUN ANIMATION TO LOGIC!, and Set Animation Speed depending on Stun Time
+        if (isJoinklerStunned)
         {
-            if(!hasPlayedStunAnim)
-            {
-                //TODO:
-                //Set Animation State Stunned
-                //JoinklerAnim.SetBool("Stunned", true);
-                //JoinklerAnim.SetFloat("StunAnimSpeed", SomeValue);
-
-                hasPlayedStunAnim = true;
-            }
-
+            joinklerStunnedTimeCurrent += Time.deltaTime;
             if (joinklerStunnedTimeCurrent >= joinklerStunnedTime)
             {
                 isJoinklerStunned = false;
+                navMeshAgent.isStopped = false;  // Setze die Bewegung fort
             }
-            else
-                joinklerStunnedTimeCurrent += Time.deltaTime;
-
-            return;
         }
 
         CheckSight();
@@ -111,14 +111,16 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    public void StunJoinkler(float StunTime)
+    public void StunJoinkler(double stunTime)
     {
-        this.joinklerStunnedTimeCurrent = 0;
-
-        this.isJoinklerStunned = true;
-        this.hasPlayedStunAnim = false;
-
-        this.joinklerStunnedTime = StunTime;
+        if (!isJoinklerStunned)  // Prüfe, ob der Gegner bereits gestunnt ist
+        {
+            isJoinklerStunned = true;
+            navMeshAgent.isStopped = true;  // Stoppe den NavMeshAgent, um die Bewegung zu unterbrechen
+            navMeshAgent.speed = 0; // Setze die Geschwindigkeit auf 0
+            joinklerStunnedTime = stunTime;
+            joinklerStunnedTimeCurrent = 0;
+        }
     }
 
     public void KillPlayer()
