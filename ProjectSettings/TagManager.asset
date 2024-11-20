@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Item
+  - PlayerHand
   layers:
   - Default
   - TransparentFX

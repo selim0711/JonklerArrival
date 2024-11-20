@@ -16,7 +16,7 @@ public class FlashLight : MonoBehaviour
         flashlightAction.Enable();
 
         // Suche nach dem Player in der Szene
-        player = GameObject.FindWithTag("Player")?.transform;
+        player = GameObject.FindWithTag("PlayerHand")?.transform;
 
         if (player == null)
         {

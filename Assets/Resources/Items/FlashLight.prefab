@@ -97,10 +97,10 @@ GameObject:
   - component: {fileID: 1838317549007711450}
   - component: {fileID: 8977627876290962864}
   - component: {fileID: 7698216679668605108}
-  - component: {fileID: 5222048202247931830}
   - component: {fileID: 6385511563048687752}
   - component: {fileID: 1731992223635636112}
   - component: {fileID: 8879849128648833162}
+  - component: {fileID: 4122321413373184099}
   m_Layer: 0
   m_Name: FlashLight
   m_TagString: Item
@@ -118,7 +118,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 75.104744, y: 0.043, z: 10.238382}
-  m_LocalScale: {x: 38.390392, y: 38.390392, z: 65.40297}
+  m_LocalScale: {x: 38.390392, y: 38.390396, z: 65.40298}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5633649212737192329}
@@ -178,27 +178,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5222048202247931830
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6089033676985023602}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.01, y: 0.01, z: 0.01}
-  m_Center: {x: 1.1641532e-10, y: -1.1641532e-10, z: 0.00057956076}
 --- !u!114 &6385511563048687752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,8 +214,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
+  m_UseGravity: 1
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -253,15 +232,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flashlightLight: {fileID: 7302644908725339189}
-  flashlightAction:
-    m_Name: Flashlight
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 08c0f5cd-a3a0-467d-bea3-8f93f55d278b
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
+--- !u!65 &4122321413373184099
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6089033676985023602}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.004, y: 0.004, z: 0.0065}
+  m_Center: {x: 1.1641532e-10, y: -1.1641532e-10, z: 0.00057956076}
 --- !u!1 &7302644908725339189
 GameObject:
   m_ObjectHideFlags: 0
@@ -305,11 +296,11 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 29.68
-  m_Range: 10
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
+  m_Color: {r: 1, g: 0.9526433, b: 0.83584905, a: 1}
+  m_Intensity: 30
+  m_Range: 15
+  m_SpotAngle: 48.252148
+  m_InnerSpotAngle: 31.52051
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
