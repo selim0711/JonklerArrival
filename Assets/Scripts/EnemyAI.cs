@@ -45,7 +45,18 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]
     private bool TestTrigger_Beatbox = false;
 
+   private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
+        }
+    }
 
+    private void OnTriggerExit(Collider collision)
+    {
+        player.gameObject.GetComponent<PlayerBeatbox>().DeactivateEvent();
+    }
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
