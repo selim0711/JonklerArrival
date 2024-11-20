@@ -1,9 +1,11 @@
 #define DebugBuild //Comment out when Game is finished
 
+using System;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data from Microphone and either use Bass Channel or use all Channels Loudness
 {
     enum AudioRecordingState
@@ -21,6 +23,8 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     public RawImage targetRenderImage = null;
 
     private bool isBeatboxActive = false;
+
+    private bool useManualControl = false;
 
     private Texture2D canvas = null;
     private Color32[] clearColors;
@@ -51,10 +55,14 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     [SerializeField, Tooltip("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
     private float EnemyStunTime = 2.0f;
 
-    private float LoudnessToFollow = 0.0f;
-    private float PlayerLoudness = 0.0f;
+    private float BeatboxToFollow = 0.0f;
+    private float PlayerBeatboxCurrent = 0.0f;
 
-    private AudioClip MicrophoneClip = null;
+    [SerializeField, Tooltip("The Index to take for the Microphone Array (0 = Default System Mic)")]
+    private int MicrophoneIndex = 0;
+    private int InternalMicrophoneIndex = 0;
+
+    private AudioSource MicrophoneSource = null;
     private Microphone MicrophoneControll = null;
 
     private AudioRecordingState audioRecordingState = AudioRecordingState.none;
@@ -64,8 +72,25 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private string AudioErrorMessage = "";
 
+    private float[] spectrumData = new float[256];
+    private float dataProcessed = 0.0f; // value between 0 and 1
+
     void Start()
     {
+        this.MicrophoneSource = GetComponent<AudioSource>();
+
+#if DebugBuild
+        if (this.targetRenderImage == null)
+        {
+            DebugLog("No Target Render Image Attached to the Beatbox Component!");
+        }
+
+        if (this.MicrophoneSource == null)
+        {
+            DebugLog("No Audio Source Component attached to the Beatbox Component");
+        }
+#endif
+
         int canvasWidth = (int)targetRenderImage.rectTransform.rect.width;
         int canvasHeight = (int)targetRenderImage.rectTransform.rect.height;
 
@@ -86,7 +111,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private void OnDestroy()
     {
-        
+
     }
 
     private static void DebugLog(object Message)
@@ -96,15 +121,39 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 #endif
     }
 
-    public void ActivateRecording()
+    private void ActivateRecording()
     {
-        if(audioRecordingState == AudioRecordingState.none) // TODO: Add Logic to take first Mic and Start Recording to Audio Clip
+        if (audioRecordingState == AudioRecordingState.none) // TODO: Add Logic to take first Mic and Start Recording to Audio Clip
         {
+            if (Microphone.devices.Length > 0)
+            {
+                InternalMicrophoneIndex = MicrophoneIndex;
+
+                if (MicrophoneIndex >= Microphone.devices.Length || MicrophoneIndex < 0)
+                {
+                    DebugLog("Entered Microphone Index was Invalid, switching to Default System Index");
+                    InternalMicrophoneIndex = 0;
+                }
+
+                this.MicrophoneSource.clip = Microphone.Start(Microphone.devices[InternalMicrophoneIndex], true, 5, 44100);
+            }
+            else
+            {
+                var lastError = "'No Input Devices detected!'";
+
+                this.AudioErrorMessage = lastError;
+
+                audioRecordingState = AudioRecordingState.failed;
+
+                DebugLog("Failed to find Default Mic because: " + lastError);
+
+                //switch to Manual Control
+            }
 
         }
         else
         {
-            switch(audioRecordingState)
+            switch (audioRecordingState)
             {
                 case AudioRecordingState.recording:
                     DebugLog("Audio is already recording!");
@@ -122,10 +171,45 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         }
     }
 
-    public void ActivateEvent()
+    private void DeactivateRecording()
     {
+        switch (audioRecordingState)
+        {
+            case AudioRecordingState.recording:
+                Microphone.End(Microphone.devices[InternalMicrophoneIndex]);
+
+                this.MicrophoneSource.clip = null;
+
+                audioRecordingState = AudioRecordingState.none;
+                break;
+
+
+            default:
+                audioRecordingState = AudioRecordingState.none;
+
+                DebugLog("Clean up not needed, Manual Controll was Active!");
+                break;
+        }
+    }
+
+    public void ActivateEvent(EnemyAI joinklerAi)
+    {
+        this.joinklerAI = joinklerAi;
+
         isBeatboxActive = true;
         CurrentTimeToBeatbox = 0;
+
+        ActivateRecording();
+    }
+
+    public void DeactivateEvent()
+    {
+        this.joinklerAI = null;
+
+        isBeatboxActive = false;
+        CurrentTimeToBeatbox = 0;
+
+        DeactivateRecording();
     }
 
     private void StunJoinkler(bool earlyBonus)
@@ -140,20 +224,47 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         joinklerAI.KillPlayer();
     }
 
+    private void UpdateProcessedData()
+    {
+        this.dataProcessed = 0.0f;
+
+        this.MicrophoneSource.GetSpectrumData(this.spectrumData, 0, FFTWindow.Rectangular);
+
+        float bassLevel = 0.0f;
+
+        for (int i = 0; i < 5; i++)
+        {
+            bassLevel += spectrumData[i];
+        }
+
+        this.dataProcessed =  bassLevel;
+    }
+
     void Update()
     {
-
-#if DebugBuild
-        if(joinklerAI == null)
-        {
-            Debug.LogError("this.joinklerAI is Null, set the Joinkler AI before Starting Event");
-        }
-#endif
         if (!isBeatboxActive)
         {
             return;
         }
-            
+
+#if DebugBuild
+        if (joinklerAI == null)
+        {
+            Debug.LogError("this.joinklerAI is Null, something went wrong and i dont even know cuh");
+            return;
+        }
+#endif
+        
+        if(useManualControl)
+        {
+
+        }
+        else
+        {
+            UpdateProcessedData();
+
+            DebugLog("Current Bass Level is: " + this.dataProcessed.ToString());
+        }
 
         if(CurrentTimeToBeatbox >= MaxTimeToBeatbox)
         {
