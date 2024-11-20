@@ -1,54 +1,76 @@
-using Unity.Cinemachine;
-using Unity.VisualScripting;
+#define DebugBuild //Comment out when Game is finished
+
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerBeatbox : MonoBehaviour
+public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data from Microphone and either use Bass Channel or use all Channels Loudness
 {
+    enum AudioRecordingState
+    {
+        none,
+        recording,
+        finished,
+        failed
+    }
+
+    [HideInInspector]
+    public EnemyAI joinklerAI = null; //Set this to the ai which the Player beatboxes against
+
     [SerializeField]
-    public RawImage rawImage = null;
+    public RawImage targetRenderImage = null;
 
     private bool isBeatboxActive = false;
-
-    public float startingValueY = 0;
-    public int curveWidth = 10;
 
     private Texture2D canvas = null;
     private Color32[] clearColors;
 
+    private Color32[] pixelBuffer;
+
+    [SerializeField, Tooltip("Width of the Sinus Curve")]
+    private int curveWidth = 10;
+    private float startingValueY = 0;
+
+    private float SinusCurveintensity = 1.0f; //Set this to the accuracy of the Beatboxing
+
     public Color32 BeatboxPlayerColor = new Color32(255, 0, 0, 255);
     private Color32 transparentColor = new Color32(0, 0, 0, 0);
 
-    [SerializeField, Header("The Maximum Time the player has time to Beatbox")]
+    [SerializeField, Tooltip("The Maximum Time the player has time to Beatbox")]
     private float MaxTimeToBeatbox = 10.0f;
     private float CurrentTimeToBeatbox = 0.0f;
+
+    [SerializeField, Tooltip("The Maximum Accuracy the player can reach, if he does he gets an bonus")]
+    private float MaxBeatboxAccuracy = 1.0f;
+
+    [SerializeField, Tooltip("The Minimum Accuracy % the player has to reach to not die"), Range(0.0f, 100.0f)]
+    private float MinBeatboxAccuracy = 1.0f;
+
+    private float PlayerBeatboxAccuracy = 0.0f;
+
+    [SerializeField, Tooltip("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
+    private float EnemyStunTime = 2.0f;
 
     private float LoudnessToFollow = 0.0f;
     private float PlayerLoudness = 0.0f;
 
-    [SerializeField, Header("The Maximum Accuracy the player can reach")]
-    private float MaxBeatboxAccuracy = 1.0f;
+    private AudioClip MicrophoneClip = null;
+    private Microphone MicrophoneControll = null;
 
-    [SerializeField, Header("The Minimum Percantage Accuracy the player has to reach"), MinMaxRangeSlider(0, 1)]
-    private float MinBeatboxAccuracy = 1.0f;
+    private AudioRecordingState audioRecordingState = AudioRecordingState.none;
+    private Thread audioRecordingThread = null;
 
-    public float PlayerBeatboxAccuracy = 0.0f;
+    private bool stopRecording = false;
 
-    [SerializeField, Header("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
-    private float EnemyStunTime = 2.0f;
-
-    public float intensity = 1.0f;
-
-    private float DrawTime = 0.0f;
-    private Color32[] pixelBuffer;
+    private string AudioErrorMessage = "";
 
     void Start()
     {
-        int canvasWidth = (int)rawImage.rectTransform.rect.width;
-        int canvasHeight = (int)rawImage.rectTransform.rect.height;
+        int canvasWidth = (int)targetRenderImage.rectTransform.rect.width;
+        int canvasHeight = (int)targetRenderImage.rectTransform.rect.height;
 
         canvas = new Texture2D(canvasWidth, canvasHeight, TextureFormat.RGBA32, false);
-        rawImage.texture = canvas;
+        targetRenderImage.texture = canvas;
 
         clearColors = new Color32[canvasWidth * canvasHeight];
         for (int i = 0; i < clearColors.Length; i++)
@@ -58,7 +80,46 @@ public class PlayerBeatbox : MonoBehaviour
 
         pixelBuffer = new Color32[canvasWidth * canvasHeight];
         ResetCanvas();
-        rawImage.enabled = true;
+
+        targetRenderImage.enabled = true;
+    }
+
+    private void OnDestroy()
+    {
+        
+    }
+
+    private static void DebugLog(object Message)
+    {
+#if DebugBuild
+        Debug.Log(Message);
+#endif
+    }
+
+    public void ActivateRecording()
+    {
+        if(audioRecordingState == AudioRecordingState.none) // TODO: Add Logic to take first Mic and Start Recording to Audio Clip
+        {
+
+        }
+        else
+        {
+            switch(audioRecordingState)
+            {
+                case AudioRecordingState.recording:
+                    DebugLog("Audio is already recording!");
+                    break;
+
+                case AudioRecordingState.finished:
+                    DebugLog("Audio clean up failed, Cleaning up now!");
+                    break;
+
+                case AudioRecordingState.failed:
+                    DebugLog("Previous Audio recording failed before because: " + AudioErrorMessage);
+                    DebugLog("Switching to Keyboard Comtrolled Beatboxing");
+                    break;
+            }
+        }
     }
 
     public void ActivateEvent()
@@ -67,18 +128,27 @@ public class PlayerBeatbox : MonoBehaviour
         CurrentTimeToBeatbox = 0;
     }
 
-    private void StunJoinkler(bool earlyBonus) //Implement Stunning Logic: Add State to Joinkler Class to Stun him, with time
+    private void StunJoinkler(bool earlyBonus)
     {
         float stunTime = this.EnemyStunTime * (earlyBonus ? 1.5f : 1.0f);
+
+        joinklerAI.StunJoinkler(stunTime);
     }
 
-    private void KillPlayer() //Implement Killing Logic: Animation and States
+    private void KillPlayer()
     {
-
+        joinklerAI.KillPlayer();
     }
 
     void Update()
     {
+
+#if DebugBuild
+        if(joinklerAI == null)
+        {
+            Debug.LogError("this.joinklerAI is Null, set the Joinkler AI before Starting Event");
+        }
+#endif
         if (!isBeatboxActive)
         {
             return;
@@ -106,22 +176,14 @@ public class PlayerBeatbox : MonoBehaviour
             }
         }
 
-        if (DrawTime >= 0.0f)
-        {
-            DrawTime = 0;
-            DrawSinusCurve();
-        }
-        else
-        {
-            DrawTime += Time.deltaTime;
-        }
+        DrawSinusCurve();
     }
 
     private void DrawSinusCurve()
     {
         int canvasHeight = canvas.height;
         int canvasWidth = canvas.width;
-        float frequency = 2.0f * Mathf.PI * intensity;
+        float frequency = 2.0f * Mathf.PI * SinusCurveintensity;
 
         System.Array.Copy(clearColors, pixelBuffer, pixelBuffer.Length);
 
@@ -156,4 +218,6 @@ public class PlayerBeatbox : MonoBehaviour
         canvas.SetPixels32(clearColors);
         canvas.Apply();
     }
+
+
 }

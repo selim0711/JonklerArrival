@@ -29,6 +29,18 @@ public class EnemyAI : MonoBehaviour
     private bool isWaiting;
     private float waitTimer;
 
+    private bool isJoinklerStunned = false;
+    private bool hasPlayedStunAnim = false;
+
+    private float joinklerStunnedTimeCurrent = 0.0f;
+    private float joinklerStunnedTime = 0.0f;
+
+    private bool isKillingPlayer = false;
+    private bool hasPlayedKillingAnim = false; // is set to true after Killing Animation has finished
+    private bool hasKilledPlayer = false;
+
+
+
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -37,6 +49,46 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if(isKillingPlayer) //Play Animation for Joinkler Killing Player. TODO: Add Animation Logic for Killing Player
+        {
+            if (!hasPlayedKillingAnim)
+            {
+                //TODO:
+                //Set Animation State Killing Player
+                //JoinklerAnim.SetBool("Kill_Player", true);
+
+                hasPlayedKillingAnim = true;
+                return;
+            }
+                
+
+            if (!hasKilledPlayer) // this gets put to true automatically by State
+                return;
+        }
+
+
+        if(isJoinklerStunned) // Joinkler has been stunned, skip Updating. TODO: ADD STUN ANIMATION TO LOGIC!, and Set Animation Speed depending on Stun Time
+        {
+            if(!hasPlayedStunAnim)
+            {
+                //TODO:
+                //Set Animation State Stunned
+                //JoinklerAnim.SetBool("Stunned", true);
+                //JoinklerAnim.SetFloat("StunAnimSpeed", SomeValue);
+
+                hasPlayedStunAnim = true;
+            }
+
+            if (joinklerStunnedTimeCurrent >= joinklerStunnedTime)
+            {
+                isJoinklerStunned = false;
+            }
+            else
+                joinklerStunnedTimeCurrent += Time.deltaTime;
+
+            return;
+        }
+
         CheckSight();
 
         if (playerInSight)
@@ -57,6 +109,21 @@ public class EnemyAI : MonoBehaviour
             navMeshAgent.speed = patrolSpeed;
             Patrol();
         }
+    }
+
+    public void StunJoinkler(float StunTime)
+    {
+        this.joinklerStunnedTimeCurrent = 0;
+
+        this.isJoinklerStunned = true;
+        this.hasPlayedStunAnim = false;
+
+        this.joinklerStunnedTime = StunTime;
+    }
+
+    public void KillPlayer()
+    {
+
     }
 
     private void CheckSight()
