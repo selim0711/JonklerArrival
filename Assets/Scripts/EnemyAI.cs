@@ -42,6 +42,8 @@ public class EnemyAI : MonoBehaviour
 
     [SerializeField]
     private bool TestTrigger_Stun = false;
+    [SerializeField]
+    private bool TestTrigger_Beatbox = false;
 
 
     private void Awake()
@@ -57,6 +59,14 @@ public class EnemyAI : MonoBehaviour
             TestTrigger_Stun = false;
 
             this.StunJoinkler(4.7);
+        }
+
+        if(TestTrigger_Beatbox)
+        {
+            
+            TestTrigger_Beatbox = false;
+
+            player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
         }
 
         if(isKillingPlayer) //Play Animation for Joinkler Killing Player. TODO: Add Animation Logic for Killing Player
