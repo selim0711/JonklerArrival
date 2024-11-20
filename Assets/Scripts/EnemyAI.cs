@@ -135,7 +135,7 @@ public class EnemyAI : MonoBehaviour
 
     public void KillPlayer()
     {
-
+        Debug.Log("Killed Player!");
     }
 
     private void CheckSight()

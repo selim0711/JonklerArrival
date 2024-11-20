@@ -210,6 +210,8 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         CurrentTimeToBeatbox = 0;
 
         DeactivateRecording();
+
+        ResetCanvas();
     }
 
     private void StunJoinkler(bool earlyBonus)
@@ -228,7 +230,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     {
         this.dataProcessed = 0.0f;
 
-        this.MicrophoneSource.GetSpectrumData(this.spectrumData, 0, FFTWindow.Rectangular);
+        this.MicrophoneSource.GetSpectrumData(this.spectrumData, 1, FFTWindow.Rectangular);
 
         float bassLevel = 0.0f;
 
@@ -276,6 +278,10 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
             {
                 KillPlayer();
             }
+
+            DeactivateEvent();
+
+            return;
         }
         else
         {
@@ -284,6 +290,10 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
             if (PlayerBeatboxAccuracy >= MaxBeatboxAccuracy) //if player reaches Maximum Accuracy, end early
             {
                 StunJoinkler(true);
+
+                DeactivateEvent();
+
+                return;
             }
         }
 
