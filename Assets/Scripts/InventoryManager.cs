@@ -19,26 +19,30 @@ public class InventoryManager : MonoBehaviour
 
     public InputAction pickupAction; // Für das Aufheben von Items
     public InputAction inventoryAction; // Input für das Inventar öffnen
+    private InputAction throwAction;
 
     private void Awake()
     {
         pickupAction = new InputAction("Pickup", binding: "<Keyboard>/e");
         inventoryAction = new InputAction("Inventory", binding: "<Keyboard>/i");
+        throwAction = new InputAction("Throw_Action", binding: "<Keyboard>/e");
 
         pickupAction.performed += ctx => Interact(); // Diese Methode behandelt das Aufheben
         inventoryAction.performed += ctx => ToggleInventory();
+        throwAction.performed += ctx => ThrowEquippedItem();
     }
-
     private void OnEnable()
     {
         pickupAction?.Enable();
         inventoryAction?.Enable();
+        throwAction?.Enable();
     }
 
     private void OnDisable()
     {
         pickupAction.Disable();
         inventoryAction.Disable();
+        throwAction.Disable();
     }
 
     private void Interact()
@@ -125,6 +129,34 @@ public class InventoryManager : MonoBehaviour
 
         equippedItem = null;
         Debug.Log("Item wurde abgerüstet!");
+    }
+
+    private void ThrowEquippedItem()
+    {
+        if (equippedItem == null || !equippedItem.GetComponent<Airhorn>().isThrowable)
+        {
+            Debug.Log("Kein ausgerüstetes Item oder Item ist nicht werfbar.");
+            return;
+        }
+
+        Debug.Log($"Werfe Item: {equippedItem.itemName}");
+
+        // Entferne das Item aus der Hand und dem Inventar
+        GameObject thrownItem = equippedItem.gameObject;
+        inventory.Remove(equippedItem);
+        UnequipItem();
+
+        // Aktivere Physik und löse es von der Hand
+        thrownItem.SetActive(true);
+        thrownItem.transform.SetParent(null);
+        Rigidbody rb = thrownItem.GetComponent<Rigidbody>() ?? thrownItem.AddComponent<Rigidbody>();
+        rb.isKinematic = false;
+
+        // Werfe das Item
+        thrownItem.GetComponent<Airhorn>()?.Throw();
+
+        // Aktualisiere die UI
+        UpdateInventoryUI();
     }
 
     private void UpdateInventoryUI()

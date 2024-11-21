@@ -38,12 +38,25 @@ public class EnemyAI : MonoBehaviour
     private bool isKillingPlayer = false;
     private bool hasPlayedKillingAnim = false; // is set to true after Killing Animation has finished
     private bool hasKilledPlayer = false;
-
+    public bool beatboxEvent = false;
 
     [SerializeField]
     private bool TestTrigger_Stun = false;
     [SerializeField]
     private bool TestTrigger_Beatbox = false;
+    
+   private void OnTriggerEnter(Collider collision)
+    {
+        if (beatboxEvent == true)
+            return;
+
+        beatboxEvent = true;
+        if (collision.gameObject.CompareTag("Player"))
+        {
+
+            player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
+        }
+    }
 
 
     private void Awake()

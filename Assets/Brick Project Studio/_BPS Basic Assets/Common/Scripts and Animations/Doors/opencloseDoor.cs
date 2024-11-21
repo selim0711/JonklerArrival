@@ -6,18 +6,19 @@ using UnityEngine.InputSystem;
 namespace SojaExiles
 
 {
-	public class opencloseDoor : MonoBehaviour
-	{
-        public Animator openandclose;
-        public bool open = false;
-        public Transform player;
-        public float interactionRange = 3f;
+    public class opencloseDoor : MonoBehaviour
+    {
+        public Animator openandclose;  // Animator that controls the door animations
+        public string doorID = "";  // Door ID for key matching, empty means unlocked by default
+        public bool open = false;  // Current state of the door
+        public Transform player;  // Reference to the player transform
+        public float interactionRange = 3f;  // Maximum distance to interact with the door
+        public bool isLocked => !string.IsNullOrEmpty(doorID);  // Locked if doorID is not empty
 
         private InputAction interactAction;
 
         private void Start()
         {
-            // Initialize the Interact action to listen for the "E" key press
             interactAction = new InputAction("Interact", binding: "<Keyboard>/e");
             interactAction.performed += OnInteract;
             interactAction.Enable();
@@ -25,37 +26,42 @@ namespace SojaExiles
 
         private void OnDestroy()
         {
-            interactAction.performed -= OnInteract;
+            if (interactAction != null)
+            {
+                interactAction.performed -= OnInteract;
+                interactAction.Disable();
+            }
         }
 
         private void OnInteract(InputAction.CallbackContext context)
         {
-            // Raycast from the Player's position forward
-            Ray ray = new Ray(player.position, player.forward);
-            RaycastHit hit;
-
-            // Check if the ray hits within the interaction range and hits this door
-            if (Physics.Raycast(ray, out hit, interactionRange))
+            if (Vector3.Distance(player.position, transform.position) <= interactionRange)
             {
-                if (hit.transform == transform) // Ensure the raycast is hitting this specific door
+                if (!isLocked || open)
                 {
-                    Debug.Log("Door detected. Attempting to open/close.");
-                    if (!open)
-                    {
-                        StartCoroutine(Opening());
-                    }
-                    else
-                    {
-                        StartCoroutine(Closing());
-                    }
+                    ToggleDoor();
+                }
+                else
+                {
+                    Debug.Log("The door is locked.");
                 }
             }
+        }
 
+        private void ToggleDoor()
+        {
+            if (!open)
+            {
+                StartCoroutine(Opening());
+            }
+            else
+            {
+                StartCoroutine(Closing());
+            }
         }
 
         IEnumerator Opening()
         {
-            Debug.Log("Opening the door");
             openandclose.Play("Opening");
             open = true;
             yield return new WaitForSeconds(0.5f);
@@ -63,10 +69,15 @@ namespace SojaExiles
 
         IEnumerator Closing()
         {
-            Debug.Log("Closing the door");
             openandclose.Play("Closing");
             open = false;
             yield return new WaitForSeconds(0.5f);
+        }
+
+        public void UnlockDoor()
+        {
+            doorID = "";  // Remove the door ID to unlock it
+            Debug.Log("Door unlocked");
         }
     }
 }

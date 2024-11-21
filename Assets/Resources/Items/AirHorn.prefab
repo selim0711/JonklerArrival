@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2037925299985442286}
   - component: {fileID: 5864489709145957579}
   - component: {fileID: 5200802253033953180}
+  - component: {fileID: 1982211078969661537}
   m_Layer: 0
   m_Name: AirHorn
   m_TagString: Item
@@ -113,8 +114,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyAI: {fileID: 0}
   airhornIntensity: 30
+  triggerDuration: 5
   audioSource: {fileID: 5200802253033953180}
   airhornSound: {fileID: 8300000, guid: 5b549b4e5261341479f320360fb2f6c6, type: 3}
+  isThrowable: 1
 --- !u!82 &5200802253033953180
 AudioSource:
   m_ObjectHideFlags: 0
@@ -135,9 +138,9 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 5
+  DopplerLevel: 1.5
+  MinDistance: 6.3023834
+  MaxDistance: 21.264017
   Pan2D: 0
   rolloffMode: 2
   BypassEffects: 0
@@ -196,7 +199,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.16944444
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -221,6 +224,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!65 &1982211078969661537
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5229512271663769724}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.21, y: 0.56, z: 0.24}
+  m_Center: {x: 0, y: -0.2, z: 0}
 --- !u!1 &8309719143730026467
 GameObject:
   m_ObjectHideFlags: 0
