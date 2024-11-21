@@ -8,7 +8,7 @@ public class Airhorn : MonoBehaviour
     public AudioSource audioSource; // AudioSource-Komponente
     public AudioClip airhornSound; // Der Airhorn Soundclip
     public bool isThrowable = true; // Ob das Airhorn geworfen werden kann
-    public PhysicsMaterial bounceMaterial; // Physics material for bouncing
+
 
     private Transform player; // Referenz auf den Spieler
     private Rigidbody rb;
@@ -27,12 +27,7 @@ public class Airhorn : MonoBehaviour
             rb.isKinematic = true; // Standardmäßig deaktiviert
         }
 
-        if (airhornCollider != null)
-        {
-            bounceMaterial.bounciness = 0.8f; // Erhöhung der Bounciness
-            bounceMaterial.bounceCombine = PhysicsMaterialCombine.Maximum;
-            airhornCollider.material = bounceMaterial;
-        }
+
 
         if (audioSource == null)
         {
@@ -153,9 +148,9 @@ public class Airhorn : MonoBehaviour
     public void ResetAirhornState()
     {
         isThrown = false;
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
         airhornCollider.enabled = true;
-        airhornCollider.material = bounceMaterial; // Erneut das Bounce Material zuweisen
+        
         Debug.Log("Airhorn zurückgesetzt und nutzbar.");
     }
 }
