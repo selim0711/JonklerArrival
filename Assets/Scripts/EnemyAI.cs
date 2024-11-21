@@ -40,29 +40,35 @@ public class EnemyAI : MonoBehaviour
     private bool hasKilledPlayer = false;
     public bool beatboxEvent = false;
 
+    private BoxCollider beatboxEventTrigger = null;
+
     [SerializeField]
     private bool TestTrigger_Stun = false;
     [SerializeField]
     private bool TestTrigger_Beatbox = false;
     
    private void OnTriggerEnter(Collider collision)
-    {
-        if (beatboxEvent == true)
-            return;
+   {
+       if (collision.gameObject.CompareTag("Player"))
+       {
 
-        beatboxEvent = true;
-        if (collision.gameObject.CompareTag("Player"))
-        {
-
-            player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
-        }
-    }
+           player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
+       }
+   }
 
 
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.speed = patrolSpeed; // Set initial speed to patrol speed
+
+        var colliders = GetComponents<BoxCollider>();
+
+        for(int i = 0; i < colliders.Length; i++)
+        {
+            if(colliders[i].isTrigger)
+                this.beatboxEventTrigger = colliders[i];
+        }
     }
 
     private void Update()
@@ -144,6 +150,11 @@ public class EnemyAI : MonoBehaviour
             joinklerStunnedTime = stunTime;
             joinklerStunnedTimeCurrent = 0;
         }
+    }
+
+    public void SetTriggerColliderState(bool value)
+    {
+        this.beatboxEventTrigger.isTrigger = value;
     }
 
     public void KillPlayer()

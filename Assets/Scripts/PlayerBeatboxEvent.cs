@@ -1,8 +1,7 @@
 #define DebugBuild //Comment out when Game is finished
 
-using System;
-using System.Threading;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
@@ -55,20 +54,22 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     [SerializeField, Tooltip("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
     private float EnemyStunTime = 2.0f;
 
+    private float ChangeBeatboxValueTimeCurrent = 0.0f;
+
+    [SerializeField, Tooltip("The time it takes for the Beatbox Value to change in Seconds")]
+    private float ChangeBeatboxValueTime = 3.0f;
+
     private float BeatboxToFollow = 0.0f;
-    private float PlayerBeatboxCurrent = 0.0f;
 
     [SerializeField, Tooltip("The Index to take for the Microphone Array (0 = Default System Mic)")]
     private int MicrophoneIndex = 0;
     private int InternalMicrophoneIndex = 0;
 
     private AudioSource MicrophoneSource = null;
-    private Microphone MicrophoneControll = null;
-
     private AudioRecordingState audioRecordingState = AudioRecordingState.none;
-    private Thread audioRecordingThread = null;
 
-    private bool stopRecording = false;
+    [SerializeField]
+    private AudioMixerGroup silentMixerAsset = null;
 
     private string AudioErrorMessage = "";
 
@@ -107,11 +108,13 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         ResetCanvas();
 
         targetRenderImage.enabled = true;
+
+        ActivateRecording();
     }
 
     private void OnDestroy()
     {
-
+        DeactivateEvent();
     }
 
     private static void DebugLog(object Message)
@@ -135,7 +138,15 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
                     InternalMicrophoneIndex = 0;
                 }
 
-                this.MicrophoneSource.clip = Microphone.Start(Microphone.devices[InternalMicrophoneIndex], true, 5, 44100);
+                this.MicrophoneSource.clip = Microphone.Start(Microphone.devices[InternalMicrophoneIndex], true, 1, 44100);
+
+
+                if (!this.silentMixerAsset)
+                {
+                    DebugLog("this.silentMixerAsset was null, leaving output to normal Deivce Output");
+                }
+                else
+                    this.MicrophoneSource.outputAudioMixerGroup = this.silentMixerAsset;
             }
             else
             {
@@ -176,6 +187,8 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         switch (audioRecordingState)
         {
             case AudioRecordingState.recording:
+                this.MicrophoneSource.Stop();
+
                 Microphone.End(Microphone.devices[InternalMicrophoneIndex]);
 
                 this.MicrophoneSource.clip = null;
@@ -196,21 +209,24 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     {
         this.joinklerAI = joinklerAi;
 
-        isBeatboxActive = true;
-        CurrentTimeToBeatbox = 0;
+        this.joinklerAI.SetTriggerColliderState(false);
 
-        ActivateRecording();
+        isBeatboxActive = true;
+
+        CurrentTimeToBeatbox = 0;
+        PlayerBeatboxAccuracy = 0;
     }
 
     public void DeactivateEvent()
     {
+        this.joinklerAI.SetTriggerColliderState(true);
+
         this.joinklerAI.beatboxEvent = false;
+
         this.joinklerAI = null;
 
         isBeatboxActive = false;
         CurrentTimeToBeatbox = 0;
-
-        DeactivateRecording();
 
         ResetCanvas();
     }
@@ -229,9 +245,11 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private void UpdateProcessedData()
     {
+        this.MicrophoneSource.Play();
+
         this.dataProcessed = 0.0f;
 
-        this.MicrophoneSource.GetSpectrumData(this.spectrumData, 1, FFTWindow.Rectangular);
+        this.MicrophoneSource.GetSpectrumData(this.spectrumData, 0, FFTWindow.Rectangular);
 
         float bassLevel = 0.0f;
 
@@ -269,7 +287,18 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
             DebugLog("Current Bass Level is: " + this.dataProcessed.ToString());
         }
 
-        if(CurrentTimeToBeatbox >= MaxTimeToBeatbox)
+        if (ChangeBeatboxValueTimeCurrent >= ChangeBeatboxValueTime)
+        {
+            ChangeBeatboxValueTimeCurrent = 0;
+
+            //this.PlayerBeatboxAccuracy = 
+
+            this.BeatboxToFollow = Random.Range(1.0f, 2.0f);
+        }
+        else
+            ChangeBeatboxValueTimeCurrent += Time.deltaTime;
+
+        if (CurrentTimeToBeatbox >= MaxTimeToBeatbox)
         {
             if (PlayerBeatboxAccuracy >= MinBeatboxAccuracy)
             {
