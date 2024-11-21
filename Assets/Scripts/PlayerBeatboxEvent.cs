@@ -108,11 +108,13 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         ResetCanvas();
 
         targetRenderImage.enabled = true;
+
+        ActivateRecording();
     }
 
     private void OnDestroy()
     {
-
+        DeactivateEvent();
     }
 
     private static void DebugLog(object Message)
@@ -207,21 +209,24 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     {
         this.joinklerAI = joinklerAi;
 
-        isBeatboxActive = true;
-        CurrentTimeToBeatbox = 0;
+        this.joinklerAI.SetTriggerColliderState(false);
 
-        ActivateRecording();
+        isBeatboxActive = true;
+
+        CurrentTimeToBeatbox = 0;
+        PlayerBeatboxAccuracy = 0;
     }
 
     public void DeactivateEvent()
     {
+        this.joinklerAI.SetTriggerColliderState(true);
+
         this.joinklerAI.beatboxEvent = false;
+
         this.joinklerAI = null;
 
         isBeatboxActive = false;
         CurrentTimeToBeatbox = 0;
-
-        DeactivateRecording();
 
         ResetCanvas();
     }
@@ -286,7 +291,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         {
             ChangeBeatboxValueTimeCurrent = 0;
 
-            this.PlayerBeatboxAccuracy = 
+            //this.PlayerBeatboxAccuracy = 
 
             this.BeatboxToFollow = Random.Range(1.0f, 2.0f);
         }

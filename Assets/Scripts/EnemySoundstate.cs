@@ -62,7 +62,7 @@ public class EnemySoundstate : MonoBehaviour
     {
         if (currentState == newState) return;
 
-        Debug.Log($"Transitioning from {currentState} to {newState}");
+        //Debug.Log($"Transitioning from {currentState} to {newState}");
         currentState = newState;
 
         if (audioSource.isPlaying) audioSource.Stop();
