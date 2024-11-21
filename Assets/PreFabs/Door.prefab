@@ -147,6 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   openandclose: {fileID: 5599776160168734718}
+  doorID: 2
   open: 0
   player: {fileID: 0}
   interactionRange: 10
