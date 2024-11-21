@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 6946237528322537002}
+    - target: {fileID: 1807767921335855056, guid: a6283bd7252467743ae90785357e247f, type: 3}
+      propertyPath: interactionRange
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3650941986571458721, guid: a6283bd7252467743ae90785357e247f, type: 3}
       propertyPath: m_Name
       value: Door-Basement
@@ -5760,6 +5764,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1982211078969661537, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: f492ba76f64462e4b8db59b3dd37f08c, type: 2}
+    - target: {fileID: 2037925299985442286, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037925299985442286, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4651218486424196655, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5229512271663769724, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
       propertyPath: m_Name
       value: AirHorn
@@ -5768,6 +5788,14 @@ PrefabInstance:
       propertyPath: enemyAI
       value: 
       objectReference: {fileID: 1924999356}
+    - target: {fileID: 5864489709145957579, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: bounceMaterial
+      value: 
+      objectReference: {fileID: 13400000, guid: f492ba76f64462e4b8db59b3dd37f08c, type: 2}
+    - target: {fileID: 5864489709145957579, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: bouncyMaterial
+      value: 
+      objectReference: {fileID: 13400000, guid: f492ba76f64462e4b8db59b3dd37f08c, type: 2}
     - target: {fileID: 8781788713884775356, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 84.53275
@@ -7020,6 +7048,10 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 6946237528322537002}
+    - target: {fileID: 1807767921335855056, guid: a6283bd7252467743ae90785357e247f, type: 3}
+      propertyPath: interactionRange
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3650941986571458721, guid: a6283bd7252467743ae90785357e247f, type: 3}
       propertyPath: m_Name
       value: Door-Bedroom

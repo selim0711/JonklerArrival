@@ -204,6 +204,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     public void DeactivateEvent()
     {
+        this.joinklerAI.beatboxEvent = false;
         this.joinklerAI = null;
 
         isBeatboxActive = false;

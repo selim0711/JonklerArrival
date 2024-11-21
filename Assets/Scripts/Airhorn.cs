@@ -5,12 +5,12 @@ public class Airhorn : MonoBehaviour
 {
     public EnemyAI enemyAI; // Referenz zum Enemy AI Skript
     public float airhornIntensity = 30f; // Intensität des Geräuschs
-    public float triggerDuration = 5f; // Dauer des Geräuscherzeugens
     public AudioSource audioSource; // AudioSource-Komponente
     public AudioClip airhornSound; // Der Airhorn Soundclip
     public bool isThrowable = true; // Ob das Airhorn geworfen werden kann
-    private Transform player; // Referenz auf den Spieler
+    public PhysicsMaterial bounceMaterial; // Physics material for bouncing
 
+    private Transform player; // Referenz auf den Spieler
     private Rigidbody rb;
     private Collider airhornCollider;
     private bool isThrown = false; // Ob das Airhorn geworfen wurde
@@ -19,8 +19,6 @@ public class Airhorn : MonoBehaviour
     private void Start()
     {
         player = GameObject.FindWithTag("PlayerHand")?.transform;
-
-        // Physik-Initialisierung
         rb = GetComponent<Rigidbody>();
         airhornCollider = GetComponent<Collider>();
 
@@ -29,12 +27,18 @@ public class Airhorn : MonoBehaviour
             rb.isKinematic = true; // Standardmäßig deaktiviert
         }
 
+        if (airhornCollider != null)
+        {
+            bounceMaterial.bounciness = 0.8f; // Erhöhung der Bounciness
+            bounceMaterial.bounceCombine = PhysicsMaterialCombine.Maximum;
+            airhornCollider.material = bounceMaterial;
+        }
+
         if (audioSource == null)
         {
             Debug.LogError("Keine AudioSource-Komponente gefunden! Bitte füge eine AudioSource-Komponente hinzu.");
         }
 
-        // Input für "F_Action" (Hupen in der Hand)
         airhornAction = new InputAction("F_Action", binding: "<Keyboard>/f");
         airhornAction.performed += OnUseAirhorn;
         airhornAction.Enable();
@@ -42,14 +46,13 @@ public class Airhorn : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Input-Aktion deaktivieren, um Speicherlecks zu vermeiden
         airhornAction.performed -= OnUseAirhorn;
         airhornAction.Disable();
     }
 
     private void OnUseAirhorn(InputAction.CallbackContext context)
     {
-        if (!isThrown && IsChildOfPlayer()) // Nur in der Hand nutzbar
+        if (!isThrown && IsChildOfPlayer())
         {
             UseAirhorn();
         }
@@ -77,21 +80,21 @@ public class Airhorn : MonoBehaviour
         isThrown = true;
         Debug.Log("Airhorn wird geworfen!");
 
-        // Physik aktivieren
         if (rb != null && airhornCollider != null)
         {
-            rb.isKinematic = false; // Physik aktivieren
-            rb.AddForce(Camera.main.transform.forward * 10f, ForceMode.VelocityChange);
-            airhornCollider.enabled = true; // Collider aktivieren
+            rb.isKinematic = false;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // Stelle auf kontinuierliche Kollisionserkennung um
+            Vector3 throwDirection = Camera.main.transform.forward + new Vector3(0, 0.2f, 0); // Leicht nach oben werfen
+            rb.AddForce(throwDirection * 10f, ForceMode.Impulse);
+            airhornCollider.enabled = true;
         }
 
-        // Geräuscherzeugung starten
         StartCoroutine(TriggerAirhorn());
     }
 
     private IEnumerator TriggerAirhorn()
     {
-        for (int i = 0; i < 5; i++) // 5 Mal Geräusche abspielen
+        for (int i = 0; i < 5; i++)
         {
             PlaySound();
             enemyAI?.DetectNoise(transform.position, airhornIntensity);
@@ -99,7 +102,7 @@ public class Airhorn : MonoBehaviour
         }
 
         Debug.Log("Airhorn hat das Geräuscherzeugen beendet.");
-        MakePickupable(); // Airhorn erneut aufhebbar machen
+        MakePickupable();
     }
 
     private void PlaySound()
@@ -116,10 +119,10 @@ public class Airhorn : MonoBehaviour
 
     private void MakePickupable()
     {
-        isThrown = false; // Status zurücksetzen
-        rb.isKinematic = true; // Physik deaktivieren
-        airhornCollider.enabled = true; // Collider aktivieren
-        gameObject.tag = "Item"; // Tag setzen, damit es aufhebbar ist
+        isThrown = false;
+        rb.isKinematic = true;
+        airhornCollider.enabled = true;
+        gameObject.tag = "Item";
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -127,34 +130,32 @@ public class Airhorn : MonoBehaviour
         if (isThrown)
         {
             Debug.Log($"Airhorn kollidiert mit: {collision.gameObject.name}");
-            rb.isKinematic = true; // Bewegung stoppen
-            airhornCollider.enabled = true; // Collider aktivieren
             ResetAirhornState();
         }
     }
 
     private bool IsChildOfPlayer()
     {
-        // Prüfe die gesamte Parent-Hierarchie
         Transform currentParent = transform;
 
         while (currentParent != null)
         {
             if (currentParent == player)
             {
-                return true; // Airhorn ist Teil der Spieler-Hierarchie
+                return true;
             }
-            currentParent = currentParent.parent; // Gehe eine Ebene höher
+            currentParent = currentParent.parent;
         }
 
-        return false; // Airhorn ist nicht Teil des Spielers
+        return false;
     }
 
     public void ResetAirhornState()
     {
-        isThrown = false; // Werfen zurücksetzen
-        rb.isKinematic = true; // Physik deaktivieren
-        airhornCollider.enabled = true; // Collider aktivieren
+        isThrown = false;
+        rb.isKinematic = true;
+        airhornCollider.enabled = true;
+        airhornCollider.material = bounceMaterial; // Erneut das Bounce Material zuweisen
         Debug.Log("Airhorn zurückgesetzt und nutzbar.");
     }
 }
