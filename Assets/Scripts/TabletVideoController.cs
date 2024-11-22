@@ -9,6 +9,7 @@ public class TabletVideoController : MonoBehaviour
         videoPlayer = GetComponent<VideoPlayer>();
         videoPlayer.loopPointReached += EndReached;
         videoPlayer.Play();  // Starte das Video automatisch beim Spielstart
+        videoPlayer.EnableAudioTrack(0, false);
     }
 
     void Update()
