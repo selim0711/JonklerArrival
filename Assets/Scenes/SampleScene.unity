@@ -5756,7 +5756,9 @@ MonoBehaviour:
   MaxBeatboxAccuracy: 1
   MinBeatboxAccuracy: 1
   EnemyStunTime: 2
+  ChangeBeatboxValueTime: 3
   MicrophoneIndex: 0
+  silentMixerAsset: {fileID: 0}
 --- !u!114 &239471456336074235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5825,7 +5827,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1063314614706967191
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5869,6 +5871,10 @@ PrefabInstance:
     - target: {fileID: 4651218486424196655, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
       propertyPath: m_Material
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5200802253033953180, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
+      propertyPath: DopplerLevel
+      value: 2.25
       objectReference: {fileID: 0}
     - target: {fileID: 5229512271663769724, guid: 4ced6727101440943a55269f9af79ed3, type: 3}
       propertyPath: m_Name
@@ -6120,6 +6126,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: e704e964-1574-456f-b73c-7cd4614d268c
     m_ActionName: 'Player/F_Action[/Keyboard/f]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f4372cca-7192-40e0-b8c1-74d94ed2c0e0
+    m_ActionName: 'Player/Throw_Action[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -6471,6 +6481,63 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5062592381773735961}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &6327206500349216920
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6560346056766343616, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_Name
+      value: IPad
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 85.86
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.559
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 20.441
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690112897346617975, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1487e2720f09dc540b638bdd9b1183b3, type: 3}
 --- !u!224 &6379602145671471056
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7309,3 +7376,4 @@ SceneRoots:
   - {fileID: 8652034930724219000}
   - {fileID: 1502824670173522208}
   - {fileID: 69627133}
+  - {fileID: 6327206500349216920}
