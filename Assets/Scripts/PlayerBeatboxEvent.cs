@@ -36,6 +36,11 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private float SinusCurveintensity = 1.0f; //Set this to the accuracy of the Beatboxing
 
+    private float targetCurveIntensity = 0.0f;
+    private float targetCurveIntensityAdd = 0.0f;
+    private bool changeIntensity = false;
+
+
     public Color32 BeatboxPlayerColor = new Color32(255, 0, 0, 255);
     private Color32 transparentColor = new Color32(0, 0, 0, 0);
 
@@ -57,7 +62,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     private float ChangeBeatboxValueTimeCurrent = 0.0f;
 
     [SerializeField, Tooltip("The time it takes for the Beatbox Value to change in Seconds")]
-    private float ChangeBeatboxValueTime = 3.0f;
+    private float ChangeBeatboxValueTime = 2.0f;
 
     private float BeatboxToFollow = 0.0f;
 
@@ -284,19 +289,42 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         {
             UpdateProcessedData();
 
-            DebugLog("Current Bass Level is: " + this.dataProcessed.ToString());
+            
+        }
+
+        if(this.changeIntensity)
+        {
+            this.SinusCurveintensity += this.targetCurveIntensityAdd;
+
+            if (this.SinusCurveintensity + this.targetCurveIntensityAdd == this.targetCurveIntensity)
+            {
+                
+                this.changeIntensity = false;
+            }
         }
 
         if (ChangeBeatboxValueTimeCurrent >= ChangeBeatboxValueTime)
         {
             ChangeBeatboxValueTimeCurrent = 0;
 
-            //this.PlayerBeatboxAccuracy = 
+            var PlayerBeatboxAccuracyCopy = this.dataProcessed / this.BeatboxToFollow;
 
-            this.BeatboxToFollow = Random.Range(1.0f, 2.0f);
+            this.changeIntensity = true;
+
+            this.targetCurveIntensity = PlayerBeatboxAccuracyCopy;
+
+            this.targetCurveIntensityAdd = ((PlayerBeatboxAccuracyCopy - this.PlayerBeatboxAccuracy) / (ChangeBeatboxValueTime / 2));
+
+            DebugLog("Current Accuracy Level is: " + (PlayerBeatboxAccuracyCopy).ToString());
+
+            this.PlayerBeatboxAccuracy = PlayerBeatboxAccuracyCopy;
+
+            this.BeatboxToFollow = Random.Range(1.0f, 4.0f);
         }
         else
             ChangeBeatboxValueTimeCurrent += Time.deltaTime;
+
+        SinusCurveintensity = Mathf.Clamp(this.PlayerBeatboxAccuracy * 100, 1.0f, 10.0f);
 
         if (CurrentTimeToBeatbox >= MaxTimeToBeatbox)
         {
