@@ -5756,7 +5756,9 @@ MonoBehaviour:
   MaxBeatboxAccuracy: 1
   MinBeatboxAccuracy: 1
   EnemyStunTime: 2
+  ChangeBeatboxValueTime: 3
   MicrophoneIndex: 0
+  silentMixerAsset: {fileID: 24300002, guid: a019147cfbe0479489626403969dda2b, type: 2}
 --- !u!114 &239471456336074235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5825,7 +5827,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1063314614706967191
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6120,6 +6122,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: e704e964-1574-456f-b73c-7cd4614d268c
     m_ActionName: 'Player/F_Action[/Keyboard/f]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f4372cca-7192-40e0-b8c1-74d94ed2c0e0
+    m_ActionName: 'Player/Throw_Action[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
