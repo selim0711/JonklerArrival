@@ -1,161 +1,89 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Video; // Importiere das Video Namespace
 
 public class IPad : MonoBehaviour
 {
-    public EnemyAI enemyAI; // Referenz zum Enemy AI Skript
-    public float iPadIntensity = 30f; // Intensität des Geräuschs
-    public AudioSource audioSource; // AudioSource-Komponente
-    public AudioClip iPadSound; // Der Airhorn Soundclip
-    public bool isThrowable = true; // Ob das Airhorn geworfen werden kann
+    public EnemyAI enemyAI;
+    public float iPadIntensity = 30f;
+    public bool isThrowable = true;
 
-
-    private Transform player; // Referenz auf den Spieler
+    private Transform player;
     private Rigidbody rb;
     private Collider iPadCollider;
-    private bool isThrown = false; // Ob das Airhorn geworfen wurde
-    private InputAction iPadAction; // InputAction für "F_Action"
+    private bool isThrown = false;
+    private InputAction iPadAction;
+    private VideoPlayer videoPlayer;
 
-    private void Start()
+    private void Awake()
     {
         player = GameObject.FindWithTag("PlayerHand")?.transform;
         rb = GetComponent<Rigidbody>();
         iPadCollider = GetComponent<Collider>();
+        videoPlayer = GetComponentInChildren<VideoPlayer>();
 
-        if (rb != null)
-        {
-            rb.isKinematic = true; // Standardmäßig deaktiviert
-        }
-
-
-
-        if (audioSource == null)
-        {
-            Debug.LogError("Keine AudioSource-Komponente gefunden! Bitte füge eine AudioSource-Komponente hinzu.");
-        }
+        rb.isKinematic = true;
 
         iPadAction = new InputAction("F_Action", binding: "<Keyboard>/f");
-        iPadAction.performed += OnUseAirhorn;
+    }
+
+    private void OnEnable()
+    {
+        iPadAction.performed += ToggleVideoPlay;
         iPadAction.Enable();
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        if(iPadAction != null)
-        {
-            iPadAction.performed -= OnUseAirhorn;
-            iPadAction.Disable();
-        }
-
+        iPadAction.performed -= ToggleVideoPlay;
+        iPadAction.Disable();
     }
 
-    private void OnUseAirhorn(InputAction.CallbackContext context)
+    private void ToggleVideoPlay(InputAction.CallbackContext context)
     {
-        if (!isThrown && IsChildOfPlayer())
+        if (isThrown || !IsChildOfPlayer())
         {
-            UseAirhorn();
+            Debug.Log("Das iPad kann nicht benutzt werden, da es geworfen wurde.");
+            return;
         }
-        else
-        {
-            Debug.Log("Das Airhorn kann nicht benutzt werden, da es geworfen wurde.");
-        }
-    }
 
-    public void UseAirhorn()
-    {
-        PlaySound();
-        Debug.Log("Airhorn benutzt!");
-        enemyAI?.DetectNoise(transform.position, iPadIntensity);
+        if (videoPlayer && videoPlayer.isPlaying)
+        {
+            videoPlayer.Pause();
+        }
+        else if (videoPlayer)
+        {
+            videoPlayer.Play();
+            enemyAI?.DetectNoise(transform.position, iPadIntensity);
+        }
     }
 
     public void Throw()
     {
         if (!isThrowable || isThrown)
         {
-            Debug.LogWarning("Airhorn kann nicht geworfen werden!");
+            Debug.LogWarning("iPad kann nicht geworfen werden!");
             return;
         }
 
         isThrown = true;
         Debug.Log("iPad wird geworfen!");
 
-        if (rb != null && iPadCollider != null)
-        {
-            rb.isKinematic = false;
-            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // Stelle auf kontinuierliche Kollisionserkennung um
-            Vector3 throwDirection = Camera.main.transform.forward + new Vector3(0, 0.2f, 0); // Leicht nach oben werfen
-            rb.AddForce(throwDirection * 10f, ForceMode.Impulse);
-            iPadCollider.enabled = true;
-        }
-
-        StartCoroutine(TriggerAirhorn());
-    }
-
-    private IEnumerator TriggerAirhorn()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            PlaySound();
-            enemyAI?.DetectNoise(transform.position, iPadIntensity);
-            yield return new WaitForSeconds(1f);
-        }
-
-        Debug.Log("Airhorn hat das Geräuscherzeugen beendet.");
-        MakePickupable();
-    }
-
-    private void PlaySound()
-    {
-        if (audioSource != null && iPadSound != null)
-        {
-            audioSource.PlayOneShot(iPadSound);
-        }
-        else
-        {
-            Debug.LogError("AudioSource oder Airhorn-Soundclip ist nicht korrekt zugewiesen!");
-        }
-    }
-
-    private void MakePickupable()
-    {
-        isThrown = false;
-        rb.isKinematic = true;
+        rb.isKinematic = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        Vector3 throwDirection = Camera.main.transform.forward + new Vector3(0, 0.2f, 0);
+        rb.AddForce(throwDirection * 10f, ForceMode.Impulse);
         iPadCollider.enabled = true;
-        gameObject.tag = "Item";
-    }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (isThrown)
+        if (videoPlayer && videoPlayer.isPlaying)
         {
-            Debug.Log($"IPad kollidiert mit: {collision.gameObject.name}");
-            ResetIPadState();
+            videoPlayer.Stop();
         }
     }
 
     private bool IsChildOfPlayer()
     {
-        Transform currentParent = transform;
-
-        while (currentParent != null)
-        {
-            if (currentParent == player)
-            {
-                return true;
-            }
-            currentParent = currentParent.parent;
-        }
-
-        return false;
-    }
-
-    public void ResetIPadState()
-    {
-        isThrown = false;
-        //rb.isKinematic = true;
-        iPadCollider.enabled = true;
-
-        Debug.Log("Airhorn zurückgesetzt und nutzbar.");
+        return player != null && player == transform.parent;
     }
 }

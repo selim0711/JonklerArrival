@@ -154,6 +154,7 @@ public class InventoryManager : MonoBehaviour
 
         // Werfe das Item
         thrownItem.GetComponent<Airhorn>()?.Throw();
+        
 
         // Aktualisiere die UI
         UpdateInventoryUI();

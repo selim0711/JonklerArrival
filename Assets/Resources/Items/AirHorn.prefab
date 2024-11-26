@@ -96,10 +96,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &5864489709145957579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +114,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyAI: {fileID: 0}
   airhornIntensity: 30
-  triggerDuration: 5
   audioSource: {fileID: 5200802253033953180}
   airhornSound: {fileID: 8300000, guid: 5b549b4e5261341479f320360fb2f6c6, type: 3}
   isThrowable: 1
@@ -138,7 +137,7 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1.5
+  DopplerLevel: 2.25
   MinDistance: 6.3023834
   MaxDistance: 21.264017
   Pan2D: 0
@@ -231,7 +230,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5229512271663769724}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: f492ba76f64462e4b8db59b3dd37f08c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 192847095875835829}
   - component: {fileID: 7570655237133738236}
   - component: {fileID: 6161900886496298383}
+  - component: {fileID: 955443324328661536}
   m_Layer: 0
   m_Name: IPad
   m_TagString: Item
@@ -57,7 +58,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6560346056766343616}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: f492ba76f64462e4b8db59b3dd37f08c, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -98,6 +99,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &955443324328661536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6560346056766343616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ae8eb51fb6f7754ea44df3b3d4defbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyAI: {fileID: 0}
+  iPadIntensity: 30
+  isThrowable: 1
 --- !u!1 &7191110072033472839
 GameObject:
   m_ObjectHideFlags: 0
@@ -201,7 +217,6 @@ GameObject:
   - component: {fileID: 6546579314731917342}
   - component: {fileID: 7844422452494852553}
   - component: {fileID: 4549853728078106870}
-  - component: {fileID: 119227331599281908}
   m_Layer: 0
   m_Name: Bildschirm
   m_TagString: Untagged
@@ -255,7 +270,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 9a8e1d4d14eab764e89be10f089e9ca7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -358,9 +373,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5061640129341169474, guid: 8bfc18b5d992c5b479a0edf48ed62481, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4549853728078106870}
-    - targetCorrespondingSourceObject: {fileID: 5061640129341169474, guid: 8bfc18b5d992c5b479a0edf48ed62481, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 119227331599281908}
   m_SourcePrefab: {fileID: 100100000, guid: 8bfc18b5d992c5b479a0edf48ed62481, type: 3}
 --- !u!328 &4549853728078106870
 VideoPlayer:
@@ -388,25 +400,13 @@ VideoPlayer:
   - {fileID: 0}
   m_DirectAudioVolumes:
   - 1
-  m_Url: 
+  m_Url: https://www.youtube.com/watch?v=2t4VphTeogo
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
   m_VideoShaders: []
---- !u!114 &119227331599281908
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7974502388115574510}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab9adb8edfb1ffe4381a638cf8d80ff4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
