@@ -26,4 +26,9 @@ public class EnemyAnim : MonoBehaviour
         bool isStunned = navMeshAgent.isStopped;
         animator.SetBool("isStunned", isStunned);
     }
+
+    public void PlayKillPlayer(string KillAnim)
+    {
+        animator.SetTrigger(KillAnim);
+    }
 }
