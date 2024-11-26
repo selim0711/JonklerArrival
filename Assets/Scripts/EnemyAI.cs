@@ -51,8 +51,8 @@ public class EnemyAI : MonoBehaviour
 
     private JoinklerFinishers killAnim = JoinklerFinishers.uppercut;
 
-    [SerializeField]
-    private GameObject killRoom = null;
+    [HideInInspector]
+    public GameObject killRoom = null;
 
     public bool beatboxEvent = false;
     private BoxCollider beatboxEventTrigger = null;
