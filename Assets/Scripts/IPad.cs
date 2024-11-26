@@ -42,8 +42,12 @@ public class IPad : MonoBehaviour
 
     private void OnDestroy()
     {
-        iPadAction.performed -= OnUseAirhorn;
-        iPadAction.Disable();
+        if(iPadAction != null)
+        {
+            iPadAction.performed -= OnUseAirhorn;
+            iPadAction.Disable();
+        }
+
     }
 
     private void OnUseAirhorn(InputAction.CallbackContext context)

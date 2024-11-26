@@ -224,16 +224,19 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     public void DeactivateEvent()
     {
-        this.joinklerAI.SetTriggerColliderState(true);
+        if(this.isBeatboxActive)
+        {
+            this.joinklerAI.SetTriggerColliderState(true);
 
-        this.joinklerAI.beatboxEvent = false;
+            this.joinklerAI.beatboxEvent = false;
 
-        this.joinklerAI = null;
+            this.joinklerAI = null;
 
-        isBeatboxActive = false;
-        CurrentTimeToBeatbox = 0;
+            isBeatboxActive = false;
+            CurrentTimeToBeatbox = 0;
 
-        ResetCanvas();
+            ResetCanvas();
+        }
     }
 
     private void StunJoinkler(bool earlyBonus)
@@ -245,7 +248,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private void KillPlayer()
     {
-        joinklerAI.KillPlayer();
+        joinklerAI.KillPlayer(JoinklerFinishers.uppercut);
     }
 
     private void UpdateProcessedData()

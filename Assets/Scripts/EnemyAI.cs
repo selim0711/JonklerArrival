@@ -1,9 +1,18 @@
+#define DebugBuild //comment out when game is finished
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum JoinklerFinishers // the finishers animation played when the player dies
+{
+    uppercut, // default anim
+}
+
 public class EnemyAI : MonoBehaviour
 {
+    private readonly string[] killAnimsStrings = { "KillPlayerAnim_Uppercut" };
+
     [Header("Sight Settings")]
     [SerializeField] private float viewDistance = 10f;
     [SerializeField] private float viewAngle = 45f;
@@ -21,7 +30,8 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float waitTimeAtPatrolPoint = 2f;
     [SerializeField] private float patrolSpeed = 3f;
     [SerializeField] private float pursueSpeed = 6f;
-    
+
+    private EnemyAnim enemyAnim = null;
     private NavMeshAgent navMeshAgent;
     public bool playerInSight;
     private Vector3 lastKnownNoisePosition;
@@ -33,13 +43,18 @@ public class EnemyAI : MonoBehaviour
     private bool hasPlayedStunAnim = false;
 
     private float joinklerStunnedTimeCurrent = 0.0f;
-    private double joinklerStunnedTime = 2f;
+    private float joinklerStunnedTime = 2f;
 
     private bool isKillingPlayer = false;
     private bool hasPlayedKillingAnim = false;
     private bool hasKilledPlayer = false;
-    public bool beatboxEvent = false;
 
+    private JoinklerFinishers killAnim = JoinklerFinishers.uppercut;
+
+    [SerializeField]
+    private GameObject killRoom = null;
+
+    public bool beatboxEvent = false;
     private BoxCollider beatboxEventTrigger = null;
 
     [SerializeField]
@@ -62,6 +77,8 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        enemyAnim = GetComponent<EnemyAnim>();
+
         navMeshAgent.speed = patrolSpeed;
 
         var colliders = GetComponents<BoxCollider>();
@@ -76,10 +93,30 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if (isKillingPlayer)
+        {
+            if (!hasPlayedKillingAnim)
+            {
+                hasPlayedKillingAnim = true;
+
+                enemyAnim.PlayKillPlayer(killAnimsStrings[(int)killAnim]);
+
+                Debug.Log("Killed Player!");
+            }
+
+            if (true) // maybe add an Killscreen later?
+            {
+                OnFinishKillPLayer();
+            }
+
+            return;
+        }
+
+#if DebugBuild
         if (TestTrigger_Stun)
         {
             TestTrigger_Stun = false;
-            StunJoinkler(4.7);
+            StunJoinkler(4.7f);
         }
 
         if (TestTrigger_Beatbox)
@@ -87,13 +124,7 @@ public class EnemyAI : MonoBehaviour
             TestTrigger_Beatbox = false;
             player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
         }
-
-        if (isKillingPlayer && !hasPlayedKillingAnim)
-        {
-            // Setze die Animation hier ein
-            hasPlayedKillingAnim = true;
-            return;
-        }
+#endif
 
         if (isJoinklerStunned)
         {
@@ -135,7 +166,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    public void StunJoinkler(double stunTime)
+    public void StunJoinkler(float stunTime)
     {
         if (!isJoinklerStunned)
         {
@@ -152,9 +183,47 @@ public class EnemyAI : MonoBehaviour
         beatboxEventTrigger.isTrigger = value;
     }
 
-    public void KillPlayer()
+    public void KillPlayer(JoinklerFinishers killAnim)
     {
-        Debug.Log("Killed Player!");
+        this.killAnim = killAnim;
+        this.isKillingPlayer = true;
+    }
+
+    private void OnFinishKillPLayer()
+    {
+        var GameObjects = (GameObject[]) Object.FindObjectsByType(typeof(GameObject), FindObjectsSortMode.None);
+
+        var killRoomGameObjects = new List<GameObject>();
+
+        for (int i = 0; i < killRoom.transform.childCount; i++)
+        {
+            killRoomGameObjects.Add(killRoom.transform.GetChild(i).gameObject);
+        }
+
+        for (int i = 0; i < GameObjects.Length; i++)
+        {
+            bool invalidObject = false;
+
+            var currentObject = GameObjects[i];
+
+            for (int j = 0; j < killRoomGameObjects.Count; j++)
+            {
+                if(currentObject == killRoomGameObjects[j])
+                {
+                    invalidObject = true;
+                    break;
+                }
+            }
+
+            if (invalidObject)
+                continue;
+
+            Destroy(currentObject);
+        }
+
+        killRoom.SetActive(true);
+
+        //TODO: Trigger Scene restart
     }
 
     private void CheckSight()
