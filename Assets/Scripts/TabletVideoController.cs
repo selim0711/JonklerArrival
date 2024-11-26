@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Video;
+using UnityEngine.InputSystem;
 public class TabletVideoController : MonoBehaviour
 {
    
@@ -10,7 +11,6 @@ public class TabletVideoController : MonoBehaviour
     {
         videoPlayer = GetComponent<VideoPlayer>();
         videoPlayer.loopPointReached += EndReached;
-        videoPlayer.Play();  // Starte das Video automatisch beim Spielstart
  
     }
 
