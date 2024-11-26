@@ -36,7 +36,7 @@ public class EnemyAI : MonoBehaviour
     private double joinklerStunnedTime = 2f;
 
     private bool isKillingPlayer = false;
-    private bool hasPlayedKillingAnim = false; // is set to true after Killing Animation has finished
+    private bool hasPlayedKillingAnim = false;
     private bool hasKilledPlayer = false;
     public bool beatboxEvent = false;
 
@@ -46,67 +46,54 @@ public class EnemyAI : MonoBehaviour
     private bool TestTrigger_Stun = false;
     [SerializeField]
     private bool TestTrigger_Beatbox = false;
-    
-   private void OnTriggerEnter(Collider collision)
-   {
-       if (collision.gameObject.CompareTag("Player"))
-       {
 
-           player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
-       }
-   }
+    // Neue Variablen für Geräuschgedächtnis
+    private float timeSinceLastNoise = 0f;
+    [SerializeField] private float noiseMemoryTime = 10f; // Zeit, wie lange Geräusche erinnert werden
 
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
+        }
+    }
 
     private void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        navMeshAgent.speed = patrolSpeed; // Set initial speed to patrol speed
+        navMeshAgent.speed = patrolSpeed;
 
         var colliders = GetComponents<BoxCollider>();
-
-        for(int i = 0; i < colliders.Length; i++)
+        foreach (BoxCollider collider in colliders)
         {
-            if(colliders[i].isTrigger)
-                this.beatboxEventTrigger = colliders[i];
+            if (collider.isTrigger)
+            {
+                beatboxEventTrigger = collider;
+            }
         }
     }
 
     private void Update()
     {
-        if(TestTrigger_Stun)
+        if (TestTrigger_Stun)
         {
             TestTrigger_Stun = false;
-
-            this.StunJoinkler(4.7);
+            StunJoinkler(4.7);
         }
 
-        if(TestTrigger_Beatbox)
+        if (TestTrigger_Beatbox)
         {
-            
             TestTrigger_Beatbox = false;
-
             player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
         }
 
-        if(isKillingPlayer) //Play Animation for Joinkler Killing Player. TODO: Add Animation Logic for Killing Player
+        if (isKillingPlayer && !hasPlayedKillingAnim)
         {
-            if (!hasPlayedKillingAnim)
-            {
-                //TODO:
-                //Set Animation State Killing Player
-                //EnemyAnim.SetBool("Kill_Player", true);
-
-               
-
-                hasPlayedKillingAnim = true;
-                return;
-            }
-                
-
-            if (!hasKilledPlayer) // this gets put to true automatically by State
-                return;
+            // Setze die Animation hier ein
+            hasPlayedKillingAnim = true;
+            return;
         }
-
 
         if (isJoinklerStunned)
         {
@@ -114,7 +101,18 @@ public class EnemyAI : MonoBehaviour
             if (joinklerStunnedTimeCurrent >= joinklerStunnedTime)
             {
                 isJoinklerStunned = false;
-                navMeshAgent.isStopped = false;  // Setze die Bewegung fort
+                navMeshAgent.isStopped = false;
+            }
+        }
+
+        // Update der Zeit seit dem letzten Geräusch
+        if (lastKnownNoisePosition != Vector3.zero)
+        {
+            timeSinceLastNoise += Time.deltaTime;
+            if (timeSinceLastNoise > noiseMemoryTime)
+            {
+                lastKnownNoisePosition = Vector3.zero;
+                timeSinceLastNoise = 0;
             }
         }
 
@@ -122,19 +120,16 @@ public class EnemyAI : MonoBehaviour
 
         if (playerInSight)
         {
-            // Pursue the player if in sight
             navMeshAgent.speed = pursueSpeed;
             MoveTowards(player.position);
         }
         else if (lastKnownNoisePosition != Vector3.zero)
         {
-            // Move towards the last known noise position if heard
             navMeshAgent.speed = pursueSpeed;
             MoveTowards(lastKnownNoisePosition);
         }
         else
         {
-            // Patrol if no player in sight or noise detected
             navMeshAgent.speed = patrolSpeed;
             Patrol();
         }
@@ -142,11 +137,11 @@ public class EnemyAI : MonoBehaviour
 
     public void StunJoinkler(double stunTime)
     {
-        if (!isJoinklerStunned)  // Prüfe, ob der Gegner bereits gestunnt ist
+        if (!isJoinklerStunned)
         {
             isJoinklerStunned = true;
-            navMeshAgent.isStopped = true;  // Stoppe den NavMeshAgent, um die Bewegung zu unterbrechen
-            navMeshAgent.speed = 0; // Setze die Geschwindigkeit auf 0
+            navMeshAgent.isStopped = true;
+            navMeshAgent.speed = 0;
             joinklerStunnedTime = stunTime;
             joinklerStunnedTimeCurrent = 0;
         }
@@ -154,7 +149,7 @@ public class EnemyAI : MonoBehaviour
 
     public void SetTriggerColliderState(bool value)
     {
-        this.beatboxEventTrigger.isTrigger = value;
+        beatboxEventTrigger.isTrigger = value;
     }
 
     public void KillPlayer()
@@ -168,14 +163,12 @@ public class EnemyAI : MonoBehaviour
         if (player == null) return;
 
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
-
         if (Vector3.Distance(transform.position, player.position) < viewDistance)
         {
             float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-
             if (angleToPlayer < viewAngle / 2)
             {
-                RaycastHit[] hits = Physics.RaycastAll(transform.position, directionToPlayer, viewDistance);
+                RaycastHit[] hits = Physics.RaycastAll(transform.position, directionToPlayer, viewDistance, playerLayer | obstructionLayer);
                 foreach (RaycastHit hit in hits)
                 {
                     if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
@@ -184,9 +177,8 @@ public class EnemyAI : MonoBehaviour
                         lastKnownNoisePosition = Vector3.zero;
                         break;
                     }
-                    else if ((1 << hit.collider.gameObject.layer & obstructionLayer) != 0)
+                    else if ((1 << hit.collider.gameObject.layer & obstructionLayer.value) != 0)
                     {
-                        playerInSight = false;
                         break;
                     }
                 }
@@ -198,7 +190,6 @@ public class EnemyAI : MonoBehaviour
     {
         if (navMeshAgent.remainingDistance <= 0.5f && !isWaiting)
         {
-            // When reaching a patrol point, start waiting
             isWaiting = true;
             waitTimer = waitTimeAtPatrolPoint;
             navMeshAgent.ResetPath();
@@ -217,7 +208,6 @@ public class EnemyAI : MonoBehaviour
 
     private void ChooseRandomPatrolPoint()
     {
-        // Select a random patrol point from the list, avoiding the current point
         Transform nextPatrolPoint;
         do
         {
@@ -232,10 +222,10 @@ public class EnemyAI : MonoBehaviour
     {
         float detectionRange = hearingRadius + intensity;
         float distanceToNoise = Vector3.Distance(transform.position, noisePosition);
-
         if (distanceToNoise <= detectionRange)
         {
             lastKnownNoisePosition = noisePosition;
+            timeSinceLastNoise = 0; // Reset noise memory timer
             Debug.Log($"Enemy heard noise at {noisePosition} with intensity {intensity}");
         }
     }
@@ -249,10 +239,8 @@ public class EnemyAI : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, viewDistance);
-
         Vector3 viewAngleA = DirectionFromAngle(-viewAngle / 2);
         Vector3 viewAngleB = DirectionFromAngle(viewAngle / 2);
-
         Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewDistance);
         Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewDistance);
 
