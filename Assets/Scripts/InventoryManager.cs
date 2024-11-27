@@ -97,6 +97,7 @@ public class InventoryManager : MonoBehaviour
         {
             // Wenn das Item bereits ausgerüstet ist, rüste es ab
             UnequipItem();
+            
             return;
         }
 
@@ -104,6 +105,7 @@ public class InventoryManager : MonoBehaviour
         if (currentHeldItem != null)
         {
             currentHeldItem.SetActive(false); // Deaktiviere das aktuell gehaltene Item
+            
         }
 
         // Aktiviere das neue Item in der Hand
@@ -117,6 +119,7 @@ public class InventoryManager : MonoBehaviour
         equippedItem = item;
 
         Debug.Log($"{item.itemName} wurde ausgerüstet!");
+        
     }
 
     public void UnequipItem()
@@ -126,7 +129,7 @@ public class InventoryManager : MonoBehaviour
             currentHeldItem.SetActive(false); // Deaktiviere das aktuelle Item
             currentHeldItem.transform.SetParent(null); // Entferne die Parent-Verbindung
         }
-
+        
         equippedItem = null;
         Debug.Log("Item wurde abgerüstet!");
     }
