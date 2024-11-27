@@ -57,6 +57,7 @@ public class IPad : MonoBehaviour
             videoPlayer.Play();
             enemyAI?.DetectNoise(transform.position, iPadIntensity);
         }
+
     }
 
     public void Throw()

@@ -104,7 +104,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (!isInventoryOpen) // Nur wenn das Inventar geschlossen ist, erlauben wir Bewegung und Kamera
+        if (!isInventoryOpen)
         {
             HandleMovement();
             HandleLook();
@@ -112,6 +112,16 @@ public class Player : MonoBehaviour
         EmitNoiseBasedOnMovement();
         HandleStamina();
         UpdateStaminaUI();
+
+        // Ständige Überprüfung, ob der Spieler aufstehen kann
+        if (isCrouching && !CanStandUp())
+        {
+            AdjustHeight(crouchHeight);  // Spieler bleibt in geduckter Position
+        }
+        else if (isCrouching && CanStandUp() && !crouchAction.ReadValue<float>().Equals(1))  // Überprüft, ob die Crouch-Taste losgelassen wurde und genügend Raum zum Aufstehen vorhanden ist
+        {
+            StopCrouch(new InputAction.CallbackContext());
+        }
     }
     private void ToggleInventory(InputAction.CallbackContext context)
     {
@@ -266,7 +276,12 @@ public class Player : MonoBehaviour
 
         staminaBarCanvasGroup.alpha = targetAlpha;
     }
-
+    private bool CanStandUp()
+    {
+        Vector3 start = transform.position + Vector3.up * crouchHeight;  // Startpunkt der Überprüfung ist die aktuelle Position des Spielers + Crouch-Höhe
+        Vector3 end = start + Vector3.up * (standingHeight - crouchHeight);  // Endpunkt ist die Differenz zwischen stehender und geduckter Höhe
+        return !Physics.CheckCapsule(start, end, 0.3f, ~0, QueryTriggerInteraction.Ignore);  // Überprüfe, ob der Raum zwischen Start- und Endpunkt frei von Kollisionen ist
+    }
 
     private void StartCrouch(InputAction.CallbackContext context)
     {
@@ -276,8 +291,11 @@ public class Player : MonoBehaviour
 
     private void StopCrouch(InputAction.CallbackContext context)
     {
-        isCrouching = false;
-        AdjustHeight(standingHeight);
+        if (CanStandUp())
+        {
+            isCrouching = false;
+            AdjustHeight(standingHeight);
+        }
     }
 
     private void AdjustHeight(float height)
