@@ -15,4 +15,9 @@ public class KillRoomBehaviour : MonoBehaviour
     {
         
     }
+
+    public void OnAnimatorJumped()
+    {
+        joinklerAnimator.SetBool("spin", true);
+    }
 }
