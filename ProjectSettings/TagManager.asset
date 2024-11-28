@@ -7,6 +7,9 @@ TagManager:
   - Ground
   - Item
   - PlayerHand
+  - Interactable
+  - Safe
+  - Door
   layers:
   - Default
   - TransparentFX

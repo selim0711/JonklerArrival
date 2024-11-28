@@ -114,6 +114,13 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   iPadIntensity: 30
   isThrowable: 1
+  videoClips:
+  - {fileID: 32900000, guid: 435f8eec80ead4146a68e0a9437514b9, type: 3}
+  - {fileID: 32900000, guid: c47612aee0e074f40b470f556bb4e1e7, type: 3}
+  - {fileID: 32900000, guid: f2a749ec51f4f374bb9090a067127ac4, type: 3}
+  - {fileID: 32900000, guid: 58907e42958488045a6739fcdeebde91, type: 3}
+  - {fileID: 32900000, guid: 3c29488f8b9e05f4ab817d0faf7cba65, type: 3}
+  - {fileID: 32900000, guid: 5c405a4fc46a8e64294a006477ae733e, type: 3}
 --- !u!1 &7191110072033472839
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,7 +182,7 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 128
   m_RendererPriority: 0
   m_Materials:
   - {fileID: -3979510518875098732, guid: f2910fd3ecf8fe345bc3097e0003cf7c, type: 3}
@@ -382,7 +389,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7974502388115574510}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 3c29488f8b9e05f4ab817d0faf7cba65, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: 58907e42958488045a6739fcdeebde91, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}

@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 1372266881329235228}
   m_Layer: 0
   m_Name: safe_door
-  m_TagString: Untagged
+  m_TagString: Safe
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -237,6 +237,12 @@ MonoBehaviour:
   submitButton: {fileID: 0}
   closeButton: {fileID: 0}
   safeDoorAnimator: {fileID: 8842056692981792916}
+  interactionText: {fileID: 0}
+  objectsToToggle:
+  - {fileID: 0}
+  - {fileID: 0}
+  raycastDistance: 3
+  playerCamera: {fileID: 0}
   movementScript: {fileID: 0}
   cameraControlScript: {fileID: 0}
 --- !u!65 &1372266881329235228

@@ -16,6 +16,9 @@ public class IPad : MonoBehaviour
     private InputAction iPadAction;
     private VideoPlayer videoPlayer;
 
+    [SerializeField] private VideoClip[] videoClips; // Array für Videos
+    private int currentVideoIndex = 0; // Index des aktuellen Videos
+
     private void Awake()
     {
         player = GameObject.FindWithTag("PlayerHand")?.transform;
@@ -30,17 +33,17 @@ public class IPad : MonoBehaviour
 
     private void OnEnable()
     {
-        iPadAction.performed += ToggleVideoPlay;
+        iPadAction.performed += PlayNextVideo;
         iPadAction.Enable();
     }
 
     private void OnDisable()
     {
-        iPadAction.performed -= ToggleVideoPlay;
+        iPadAction.performed -= PlayNextVideo;
         iPadAction.Disable();
     }
 
-    private void ToggleVideoPlay(InputAction.CallbackContext context)
+    private void PlayNextVideo(InputAction.CallbackContext context)
     {
         if (isThrown || !IsChildOfPlayer())
         {
@@ -48,16 +51,18 @@ public class IPad : MonoBehaviour
             return;
         }
 
-        if (videoPlayer && videoPlayer.isPlaying)
+        if (videoPlayer && videoClips.Length > 0)
         {
-            videoPlayer.Pause();
-        }
-        else if (videoPlayer)
-        {
-            videoPlayer.Play();
+            currentVideoIndex = (currentVideoIndex + 1) % videoClips.Length; // Zum nächsten Video wechseln
+            videoPlayer.clip = videoClips[currentVideoIndex]; // Setze das nächste Video
+            videoPlayer.Play(); // Spiele das Video ab
             enemyAI?.DetectNoise(transform.position, iPadIntensity);
+            Debug.Log($"Video {currentVideoIndex + 1} von {videoClips.Length} abgespielt.");
         }
-
+        else
+        {
+            Debug.LogWarning("Keine Videos verfügbar!");
+        }
     }
 
     public void Throw()

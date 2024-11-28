@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 5599776160168734718}
   - component: {fileID: 1807767921335855056}
   - component: {fileID: 2646993444958606580}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DoorInner
-  m_TagString: Untagged
+  m_TagString: Door
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -147,10 +147,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   openandclose: {fileID: 5599776160168734718}
-  doorID: 2
+  doorID: 1
   open: 0
   player: {fileID: 0}
-  interactionRange: 10
+  interactionRange: 2
 --- !u!208 &2646993444958606580
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -176,9 +176,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8665331405607706515}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Door
-  m_TagString: Untagged
+  m_TagString: Interactable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 2625201399230165280}
   - component: {fileID: 173636374218360312}
   - component: {fileID: 9135332752894761482}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DoorFrame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,7 +320,7 @@ GameObject:
   - component: {fileID: 2358880594457240007}
   - component: {fileID: 3930901633316400968}
   - component: {fileID: 3442756590057786694}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Handle_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
