@@ -3519,6 +3519,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joinklerAnimator: {fileID: 2863900130519923174}
   cameraAnimator: {fileID: 585348827349127129}
+  volume: {fileID: 0}
 --- !u!1 &9128060974163473978
 GameObject:
   m_ObjectHideFlags: 0

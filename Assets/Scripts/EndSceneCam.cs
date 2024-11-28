@@ -9,7 +9,7 @@ public class EndSceneCam : MonoBehaviour
     private bool updateVignette = false;
 
     [SerializeField]
-    private float updateSpeed = 0.1f;
+    private float updateSpeed = 0.01f;
     public float updateSpeedCurrent = 0.0f;
 
     private void Start()
@@ -23,8 +23,6 @@ public class EndSceneCam : MonoBehaviour
         {
             const float updateSpeedEnd = 1.0f;
 
-            updateSpeedCurrent += updateSpeed * Time.deltaTime;
-
             if(updateSpeedCurrent > updateSpeed)
             {
                 updateVignette = false;
@@ -33,6 +31,8 @@ public class EndSceneCam : MonoBehaviour
             }
 
             killRoomBehaviour.UpdateVignette(updateSpeedCurrent);
+
+            updateSpeedCurrent += updateSpeed * Time.deltaTime;
         }
         
     }

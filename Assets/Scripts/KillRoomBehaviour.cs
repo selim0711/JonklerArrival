@@ -22,8 +22,6 @@ public class KillRoomBehaviour : MonoBehaviour
         camEndScene.killRoomBehaviour = this;
 
         volume.profile.TryGet<Vignette>(out vignetteRef);
-
-        camEndScene.updateSpeedCurrent = vignetteRef.intensity.value;
     }
 
     private void OnDestroy()
