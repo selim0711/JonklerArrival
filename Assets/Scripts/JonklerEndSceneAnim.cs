@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class JonklerEndSceneAnim : MonoBehaviour
 {
+    [HideInInspector]
+    public KillRoomBehaviour killRoomBehaviour = null;
+
     private Animator jonklerAnim = null;
 
     [SerializeField, Tooltip("The End position where the Joinkler goes in the Animation")]
@@ -56,6 +59,6 @@ public class JonklerEndSceneAnim : MonoBehaviour
 
     private void PlayKnockOutCamera()
     {
-        Debug.Log("Knocking out Camera");
+        killRoomBehaviour.PlayCameraKicked();
     }
 }
