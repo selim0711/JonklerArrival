@@ -24,8 +24,12 @@ public class SafeInteraction : MonoBehaviour
 
     private void Awake()
     {
-        var playerInput = FindObjectOfType<PlayerInput>();
-        openSafeAction = playerInput.actions["OpenSafe"];
+        var playerInput = FindAnyObjectByType<PlayerInput>();
+
+        if (playerInput != null)
+            openSafeAction = playerInput.actions["OpenSafe"];
+        else
+            Debug.LogError("player Input was nullptr while trying to set openAction");
 
         submitButton.onClick.AddListener(ValidateCode);
         closeButton.onClick.AddListener(CloseSafeUI); // Listener für den Close-Button
@@ -37,7 +41,10 @@ public class SafeInteraction : MonoBehaviour
     {
         if (!isUnlocked)
         {
-            openSafeAction.performed += _ => ToggleSafeUI();
+            if (openSafeAction != null)
+                openSafeAction.performed += _ => ToggleSafeUI();
+            else
+                Debug.LogError("Open Safe Action was NULL, failed to add ToggleSafeUI!");
         }
     }
 
@@ -45,7 +52,10 @@ public class SafeInteraction : MonoBehaviour
     {
         if (!isUnlocked)
         {
-            openSafeAction.performed -= _ => ToggleSafeUI();
+            if (openSafeAction != null)
+                openSafeAction.performed -= _ => ToggleSafeUI();
+            else
+                Debug.LogError("Open Safe Action was NULL, failed to remove ToggleSafeUI!");
         }
     }
 
