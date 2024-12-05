@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
-public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data from Microphone and either use Bass Channel or use all Channels Loudness
+public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people who got no mic
 {
     enum AudioRecordingState
     {
@@ -16,7 +16,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     }
 
     [HideInInspector]
-    public EnemyAI joinklerAI = null; //Set this to the ai which the Player beatboxes against
+    public EnemyAI joinklerAI = null;
 
     [SerializeField]
     public RawImage targetRenderImage = null;
@@ -34,7 +34,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
     private int curveWidth = 10;
     private float startingValueY = 0;
 
-    private float SinusCurveintensity = 1.0f; //Set this to the accuracy of the Beatboxing
+    private float SinusCurveintensity = 1.0f;
 
     private float targetCurveIntensity = 0.0f;
     private float targetCurveIntensityAdd = 0.0f;
@@ -131,7 +131,7 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
     private void ActivateRecording()
     {
-        if (audioRecordingState == AudioRecordingState.none) // TODO: Add Logic to take first Mic and Start Recording to Audio Clip
+        if (audioRecordingState == AudioRecordingState.none)
         {
             if (Microphone.devices.Length > 0)
             {
@@ -216,6 +216,8 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
 
         this.joinklerAI.SetTriggerColliderState(false);
 
+        this.joinklerAI.beatboxEvent = true;
+
         isBeatboxActive = true;
 
         CurrentTimeToBeatbox = 0;
@@ -291,8 +293,6 @@ public class PlayerBeatbox : MonoBehaviour // TODO: Record Microphone, Get Data 
         else
         {
             UpdateProcessedData();
-
-            
         }
 
         if(this.changeIntensity)

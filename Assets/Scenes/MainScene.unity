@@ -961,6 +961,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KillRoom
       objectReference: {fileID: 0}
+    - target: {fileID: 9126217407990826001, guid: 4b6de4e9aec9c9f4eba9d9002556299f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9186948456512162069, guid: 4b6de4e9aec9c9f4eba9d9002556299f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 19.799763
@@ -1140,7 +1144,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &380061918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1250,7 +1254,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &380992903
 Transform:
   m_ObjectHideFlags: 0
@@ -2418,6 +2422,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 69627133}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1391317444 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9126217407990826001, guid: 4b6de4e9aec9c9f4eba9d9002556299f, type: 3}
+  m_PrefabInstance: {fileID: 154549192}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1407786766 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7883547035934140883, guid: 966b9deb9cab8fd46b17fb6cf95bb5d0, type: 3}
@@ -3424,7 +3433,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!54 &5326061369081655921
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3524,7 +3533,7 @@ PrefabInstance:
     - target: {fileID: 3615987658659863030, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
       propertyPath: killRoom
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1391317444}
     - target: {fileID: 3615987658659863030, guid: 0dd3f781ab8785143baa191c899b1d43, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 

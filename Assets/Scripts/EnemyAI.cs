@@ -47,14 +47,13 @@ public class EnemyAI : MonoBehaviour
 
     private bool isKillingPlayer = false;
     private bool hasPlayedKillingAnim = false;
-    private bool hasKilledPlayer = false;
 
     private JoinklerFinishers killAnim = JoinklerFinishers.uppercut;
 
-    [HideInInspector]
     public GameObject killRoom = null;
 
     public bool beatboxEvent = false;
+    private bool hasLockedJoinkler = false; //for beatbox event so he doesnt move around
     private BoxCollider beatboxEventTrigger = null;
 
     [SerializeField]
@@ -70,6 +69,8 @@ public class EnemyAI : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            navMeshAgent.isStopped = true;
+
             player.gameObject.GetComponent<PlayerBeatbox>().ActivateEvent(this);
         }
     }
@@ -102,11 +103,6 @@ public class EnemyAI : MonoBehaviour
                 enemyAnim.PlayKillPlayer(killAnimsStrings[(int)killAnim]);
 
                 Debug.Log("Killed Player!");
-            }
-
-            if (true) // maybe add an Killscreen later?
-            {
-                OnFinishKillPLayer();
             }
 
             return;
@@ -189,7 +185,15 @@ public class EnemyAI : MonoBehaviour
         this.isKillingPlayer = true;
     }
 
-    private void OnFinishKillPLayer()
+    public void OnFinishBeatbox(bool failed)
+    {
+        if(!failed)
+        {
+            navMeshAgent.isStopped = false;
+        }
+    }
+
+    private void OnFinishKillPlayer()
     {
         var GameObjects = (GameObject[]) Object.FindObjectsByType(typeof(GameObject), FindObjectsSortMode.None);
 
@@ -224,6 +228,8 @@ public class EnemyAI : MonoBehaviour
         killRoom.SetActive(true);
 
         //TODO: Trigger Scene restart
+
+        JoinklerSceneManager.SwitchScene(JoinklerScenes.MainHouse);
     }
 
     private void CheckSight()
