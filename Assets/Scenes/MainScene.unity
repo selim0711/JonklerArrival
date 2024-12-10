@@ -3106,10 +3106,10 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4278190335
   MaxTimeToBeatbox: 10
-  MaxBeatboxAccuracy: 10
+  MaxBeatboxAccuracy: 40
   MinBeatboxAccuracy: 1
   EnemyStunTime: 2
-  ChangeBeatboxValueTime: 3
+  ChangeBeatboxValueTime: 0.2
   MicrophoneIndex: 0
   silentMixerAsset: {fileID: 24300002, guid: a019147cfbe0479489626403969dda2b, type: 2}
   lifesMax: 3

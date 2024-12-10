@@ -28,13 +28,14 @@ public class EndSceneCam : MonoBehaviour
                 updateVignette = false;
 
                 updateSpeedCurrent = updateSpeedEnd;
+
+                JoinklerSceneManager.SwitchScene(JoinklerScenes.MainHouse);
             }
 
             killRoomBehaviour.UpdateVignette(updateSpeedCurrent);
 
             updateSpeedCurrent += updateSpeed * Time.deltaTime;
         }
-        
     }
     private void OnAnimationPleadTriggerJoinkler()
     {

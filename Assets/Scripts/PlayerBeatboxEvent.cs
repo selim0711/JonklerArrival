@@ -1,7 +1,6 @@
 #define DebugBuild //Comment out when Game is finished
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
@@ -40,7 +39,7 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
     private float SinusCurveintensity = 1.0f;
 
     private float targetCurveIntensity = 0.0f;
-    private float targetCurveChangeTime = 0.1f;
+    private float targetCurveChangeTime = 0.05f;
     private float targetCurveChangeTimeCurrent = 0.0f;
 
     private bool changeIntensity = false;
@@ -61,9 +60,6 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
     private float PlayerBeatboxAccuracy = 0.0f;
 
-    private List<float> accuracyHistory = new List<float>();
-    private int historySize = 10;
-
     [SerializeField, Tooltip("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
     private float EnemyStunTime = 2.0f;
 
@@ -73,6 +69,8 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
     private float ChangeBeatboxValueTime = 0.2f;
 
     private float BeatboxToFollow = 0.0f;
+
+    private List<float> Accuracies = new List<float>();
 
     [SerializeField, Tooltip("The Index to take for the Microphone Array (0 = Default System Mic)")]
     private int MicrophoneIndex = 0;
@@ -99,6 +97,8 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
     void Start()
     {
+        this.lifesLeft = lifesMax;
+
         this.MicrophoneSource = GetComponent<AudioSource>();
         this.playerInput = GetComponent<PlayerInput>();
 
@@ -290,7 +290,7 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         float bassLevel = 0.0f;
 
-        for (int i = 0; i < spectrumData.Length; i++)
+        for (int i = 0; i < 12; i++)
         {
             bassLevel += spectrumData[i];
         }
@@ -324,6 +324,7 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
             UpdateProcessedData();
         }
 
+        /*
         if(this.changeIntensity)
         {
             if (targetCurveChangeTimeCurrent >= targetCurveChangeTime)
@@ -332,27 +333,40 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
                 this.changeIntensity = false;
             }
             else
+            {
                 this.SinusCurveintensity = targetCurveIntensity * (targetCurveChangeTimeCurrent / targetCurveChangeTime);
+                targetCurveChangeTimeCurrent += Time.deltaTime;
+            }
+                
         }
+        */
 
         if (ChangeBeatboxValueTimeCurrent >= ChangeBeatboxValueTime)
         {
+            const float minBeatboxVal = 1.0f;
+            const float maxBeatboxVal = 4.0f;
+
             ChangeBeatboxValueTimeCurrent = 0;
-            float PlayerBeatboxAccStatic = this.dataProcessed / this.BeatboxToFollow;
 
-            targetCurveIntensity = PlayerBeatboxAccStatic;
-
-            accuracyHistory.Add(PlayerBeatboxAccStatic);
-            if (accuracyHistory.Count > historySize) accuracyHistory.RemoveAt(0);
-            float smoothAccuracy = accuracyHistory.Average();
-
-            float PlayerBeatboxAccuracyCopy = (smoothAccuracy - this.MinBeatboxAccuracy) / (this.MaxTimeToBeatbox - this.MinBeatboxAccuracy);
-            this.PlayerBeatboxAccuracy = Mathf.Clamp(PlayerBeatboxAccuracyCopy, 0, 1);
-
-            this.BeatboxToFollow = Random.Range(this.MinBeatboxAccuracy, this.MaxBeatboxAccuracy);
+            this.BeatboxToFollow = Random.Range(minBeatboxVal, maxBeatboxVal);
         }
         else
+        {
             ChangeBeatboxValueTimeCurrent += Time.deltaTime;
+
+            float PlayerBeatboxAccStatic = this.dataProcessed / this.BeatboxToFollow;
+
+            if(PlayerBeatboxAccStatic < 0)
+                PlayerBeatboxAccStatic = 0.0f - PlayerBeatboxAccStatic;
+
+            float PlayerBeatboxAccuracyCopy = PlayerBeatboxAccStatic;
+            this.PlayerBeatboxAccuracy = Mathf.Clamp(PlayerBeatboxAccuracyCopy, 0, 1);
+
+            Debug.Log("Current Accuracy: " + PlayerBeatboxAccuracyCopy);
+
+            this.SinusCurveintensity = this.dataProcessed / 10.0f;
+        }
+           
 
 
 
@@ -360,7 +374,9 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         if (CurrentTimeToBeatbox >= MaxTimeToBeatbox)
         {
-            if (PlayerBeatboxAccuracy >= MinBeatboxAccuracy)
+            var accuracy = PlayerBeatboxAccuracy * 100;
+
+            if (accuracy >= MinBeatboxAccuracy)
             {
                 StunJoinkler(false);
             }
@@ -377,7 +393,9 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
         {
             CurrentTimeToBeatbox += Time.deltaTime;
 
-            if (PlayerBeatboxAccuracy >= MaxBeatboxAccuracy) //if player reaches Maximum Accuracy, end early
+            var accuracy = PlayerBeatboxAccuracy * 100;
+
+            if (accuracy >= MaxBeatboxAccuracy) //if player reaches Maximum Accuracy, end early
             {
                 StunJoinkler(true);
 
@@ -389,7 +407,7 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         ClearCanvas();
 
-        DrawSinusCurve(Mathf.Clamp(this.targetCurveIntensity * 100, 1.0f, 10.0f), new Color(0.0f, 1.0f, 0.0f));
+        DrawSinusCurve(Mathf.Clamp((BeatboxToFollow / 10.0f), 1.0f, 10.0f), new Color(0.0f, 1.0f, 0.0f));
         DrawSinusCurve(SinusCurveintensity, BeatboxPlayerColor);
 
         ApplyCanvas();
