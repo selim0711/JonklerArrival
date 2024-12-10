@@ -29,6 +29,7 @@ public class EnemyAnim : MonoBehaviour
 
     public void PlayKillPlayer(string KillAnim)
     {
+        animator.SetBool("isKillingPlayer", true);
         animator.SetTrigger(KillAnim);
     }
 }

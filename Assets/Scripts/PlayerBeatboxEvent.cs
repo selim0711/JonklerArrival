@@ -1,7 +1,10 @@
 #define DebugBuild //Comment out when Game is finished
 
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
@@ -37,7 +40,9 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
     private float SinusCurveintensity = 1.0f;
 
     private float targetCurveIntensity = 0.0f;
-    private float targetCurveIntensityAdd = 0.0f;
+    private float targetCurveChangeTime = 0.1f;
+    private float targetCurveChangeTimeCurrent = 0.0f;
+
     private bool changeIntensity = false;
 
 
@@ -56,13 +61,16 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
     private float PlayerBeatboxAccuracy = 0.0f;
 
+    private List<float> accuracyHistory = new List<float>();
+    private int historySize = 10;
+
     [SerializeField, Tooltip("The Time the Joinkler gets stunned for after Winning (In Seconds)")]
     private float EnemyStunTime = 2.0f;
 
     private float ChangeBeatboxValueTimeCurrent = 0.0f;
 
     [SerializeField, Tooltip("The time it takes for the Beatbox Value to change in Seconds")]
-    private float ChangeBeatboxValueTime = 2.0f;
+    private float ChangeBeatboxValueTime = 0.2f;
 
     private float BeatboxToFollow = 0.0f;
 
@@ -76,14 +84,23 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
     [SerializeField]
     private AudioMixerGroup silentMixerAsset = null;
 
+    private PlayerInput playerInput = null;
+
     private string AudioErrorMessage = "";
 
     private float[] spectrumData = new float[256];
     private float dataProcessed = 0.0f; // value between 0 and 1
 
+
+    private int lifesLeft = 0;
+
+    [SerializeField]
+    private int lifesMax = 3;
+
     void Start()
     {
         this.MicrophoneSource = GetComponent<AudioSource>();
+        this.playerInput = GetComponent<PlayerInput>();
 
 #if DebugBuild
         if (this.targetRenderImage == null)
@@ -187,6 +204,11 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
         }
     }
 
+    private void ActivateControls(bool value)
+    {
+        this.playerInput.enabled = value;
+    }
+
     private void DeactivateRecording()
     {
         switch (audioRecordingState)
@@ -218,6 +240,8 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         this.joinklerAI.beatboxEvent = true;
 
+        ActivateControls(false);
+
         isBeatboxActive = true;
 
         CurrentTimeToBeatbox = 0;
@@ -237,6 +261,8 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
             isBeatboxActive = false;
             CurrentTimeToBeatbox = 0;
 
+            ActivateControls(true);
+
             ResetCanvas();
         }
     }
@@ -250,7 +276,8 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
     private void KillPlayer()
     {
-        joinklerAI.KillPlayer(JoinklerFinishers.uppercut);
+        joinklerAI.OnFinishKillPlayer();
+        //joinklerAI.KillPlayer(JoinklerFinishers.uppercut);
     }
 
     private void UpdateProcessedData()
@@ -263,13 +290,15 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         float bassLevel = 0.0f;
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < spectrumData.Length; i++)
         {
             bassLevel += spectrumData[i];
         }
 
         this.dataProcessed =  bassLevel;
     }
+
+
 
     void Update()
     {
@@ -297,35 +326,35 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
 
         if(this.changeIntensity)
         {
-            this.SinusCurveintensity += this.targetCurveIntensityAdd;
-
-            if (this.SinusCurveintensity + this.targetCurveIntensityAdd == this.targetCurveIntensity)
+            if (targetCurveChangeTimeCurrent >= targetCurveChangeTime)
             {
-                
+                this.SinusCurveintensity = targetCurveIntensity;
                 this.changeIntensity = false;
             }
+            else
+                this.SinusCurveintensity = targetCurveIntensity * (targetCurveChangeTimeCurrent / targetCurveChangeTime);
         }
 
         if (ChangeBeatboxValueTimeCurrent >= ChangeBeatboxValueTime)
         {
             ChangeBeatboxValueTimeCurrent = 0;
+            float PlayerBeatboxAccStatic = this.dataProcessed / this.BeatboxToFollow;
 
-            var PlayerBeatboxAccuracyCopy = this.dataProcessed / this.BeatboxToFollow;
+            targetCurveIntensity = PlayerBeatboxAccStatic;
 
-            this.changeIntensity = true;
+            accuracyHistory.Add(PlayerBeatboxAccStatic);
+            if (accuracyHistory.Count > historySize) accuracyHistory.RemoveAt(0);
+            float smoothAccuracy = accuracyHistory.Average();
 
-            this.targetCurveIntensity = PlayerBeatboxAccuracyCopy;
+            float PlayerBeatboxAccuracyCopy = (smoothAccuracy - this.MinBeatboxAccuracy) / (this.MaxTimeToBeatbox - this.MinBeatboxAccuracy);
+            this.PlayerBeatboxAccuracy = Mathf.Clamp(PlayerBeatboxAccuracyCopy, 0, 1);
 
-            this.targetCurveIntensityAdd = ((PlayerBeatboxAccuracyCopy - this.PlayerBeatboxAccuracy) / (ChangeBeatboxValueTime / 2));
-
-            DebugLog("Current Accuracy Level is: " + (PlayerBeatboxAccuracyCopy).ToString());
-
-            this.PlayerBeatboxAccuracy = PlayerBeatboxAccuracyCopy;
-
-            this.BeatboxToFollow = Random.Range(1.0f, 4.0f);
+            this.BeatboxToFollow = Random.Range(this.MinBeatboxAccuracy, this.MaxBeatboxAccuracy);
         }
         else
             ChangeBeatboxValueTimeCurrent += Time.deltaTime;
+
+
 
         SinusCurveintensity = Mathf.Clamp(this.PlayerBeatboxAccuracy * 100, 1.0f, 10.0f);
 
@@ -358,16 +387,30 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
             }
         }
 
-        DrawSinusCurve();
+        ClearCanvas();
+
+        DrawSinusCurve(Mathf.Clamp(this.targetCurveIntensity * 100, 1.0f, 10.0f), new Color(0.0f, 1.0f, 0.0f));
+        DrawSinusCurve(SinusCurveintensity, BeatboxPlayerColor);
+
+        ApplyCanvas();
     }
 
-    private void DrawSinusCurve()
+    private void ClearCanvas()
+    {
+        System.Array.Copy(clearColors, pixelBuffer, pixelBuffer.Length);
+    }
+
+    private void ApplyCanvas()
+    {
+        canvas.SetPixels32(pixelBuffer);
+        canvas.Apply();
+    }
+
+    private void DrawSinusCurve(float SinusCurveInten, Color color)
     {
         int canvasHeight = canvas.height;
         int canvasWidth = canvas.width;
-        float frequency = 2.0f * Mathf.PI * SinusCurveintensity;
-
-        System.Array.Copy(clearColors, pixelBuffer, pixelBuffer.Length);
+        float frequency = 2.0f * Mathf.PI * SinusCurveInten;
 
         int halfWidth = curveWidth / 2;
         float offset = (startingValueY * 100);
@@ -383,7 +426,7 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
                 int newY = y + i;
                 if (newY >= 0 && newY < canvasHeight)
                 {
-                    pixelBuffer[newY * canvasWidth + x] = BeatboxPlayerColor;
+                    pixelBuffer[newY * canvasWidth + x] = color;
                 }
             }
         }
@@ -391,8 +434,6 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
         startingValueY += 0.1f * Time.deltaTime;
         if (startingValueY > 1) startingValueY = -1;
 
-        canvas.SetPixels32(pixelBuffer);
-        canvas.Apply();
     }
 
     private void ResetCanvas()
@@ -400,6 +441,4 @@ public class PlayerBeatbox : MonoBehaviour //TODO: Add Manual Control for people
         canvas.SetPixels32(clearColors);
         canvas.Apply();
     }
-
-
 }

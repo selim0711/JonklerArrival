@@ -11,7 +11,7 @@ public enum JoinklerFinishers // the finishers animation played when the player 
 
 public class EnemyAI : MonoBehaviour
 {
-    private readonly string[] killAnimsStrings = { "KillPlayerAnim_Uppercut" };
+    private readonly string[] killAnimsStrings = { "KillPlayer_Uppercut" };
 
     [Header("Sight Settings")]
     [SerializeField] private float viewDistance = 10f;
@@ -67,7 +67,7 @@ public class EnemyAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (!isJoinklerStunned && collision.gameObject.CompareTag("Player"))
         {
             navMeshAgent.isStopped = true;
 
@@ -193,7 +193,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void OnFinishKillPlayer()
+    public void OnFinishKillPlayer()
     {
         var GameObjects = (GameObject[]) Object.FindObjectsByType(typeof(GameObject), FindObjectsSortMode.None);
 
@@ -226,10 +226,6 @@ public class EnemyAI : MonoBehaviour
         }
 
         killRoom.SetActive(true);
-
-        //TODO: Trigger Scene restart
-
-        JoinklerSceneManager.SwitchScene(JoinklerScenes.MainHouse);
     }
 
     private void CheckSight()
