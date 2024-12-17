@@ -4350,7 +4350,7 @@ MonoBehaviour:
   sprintSpeed: 7
   crouchSpeed: 3
   jumpForce: 5
-  lookSensitivity: 30
+  lookSensitivity: 20
   crouchHeight: 1
   standingHeight: 2
   cameraTransform: {fileID: 380992903}
@@ -4955,7 +4955,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec413c7e6aa4b2542873e04ef2b565ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verticalSensitivity: 40
+  verticalSensitivity: 30
   maxVerticalAngle: 80
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
